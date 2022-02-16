@@ -203,3 +203,73 @@ interested, look online for a discussion of **erasure** in Java.) So we revert t
 non-parameterized type SinglyLinkedList , and non-parameterized Node declarations . If the two lists have incompatible
 types, this will be detected when calling the `equals` method on corresponding elements.
 
+## Cloning Data Structures
+
+The beauty of object-oriented programming is that abstraction allows for a data structure to be treated as a single
+object, even though the encapsulated implementation of the structure might rely on a more complex combination of many
+objects.
+
+In a programming environment, a common expectation is that a copy of an object has its own state and that, once made,
+the copy is independent of the original (for example, so that changes to one do not directly affect the other). However,
+when objects have fields that are reference variables pointing to auxiliary objects, it is not always obvious whether a
+copy should have a corresponding field that refers to the same auxiliary object, or to a new copy of that auxiliary
+object.
+
+There is no one-size-fits-all answer to questions like this. Instead, each class in Java is responsible for defining
+whether its instances can be copied, and if so, precisely how the copy is constructed. The universal Object superclass
+defines a method named **clone**, which can be used to produce what is known as a
+**shallow copy** of an object.
+
+This uses the standard assignment semantics to assign the value of each field of the new object equal to the
+corresponding field of the existing object that is being copied. The reason this is known as a shallow copy is because
+if the field is a reference type, then an initialization of the form `duplicate.field = original.field` causes the field
+of the new object to refer to the same underlying instance as the field of the original object.
+
+A shallow copy is not always appropriate for all classes, and therefore, Java intentionally disables use of
+the `clone( )` method by declaring it as protected, and by having it throw a `CloneNotSupportedException` when called.
+The author of a class must explicitly declare support for cloning by formally declaring that the class implements the
+`Cloneable` interface, and by declaring a public version of the `clone( )` method. That public method can simply call
+the protected one to do the field-by-field assignment that results in a shallow copy, if appropriate. However, for many
+classes, the class may choose to implement a deeper version of cloning, in which some the referenced objects are
+themselves cloned.
+
+##### Cloning Arrays
+
+If we want to make a copy of the array, data, and assign a reference to the new array to variable, backup, we should
+write:
+
+backup = data.clone( );
+
+The clone method, when executed on an array, initializes each cell of the new array to the value that is stored in the
+corresponding cell of the original array. This results in an independent array- If we subsequently make an assignment
+such as `data[4] = 23` in this configuration, the backup array is unaffected.
+
+There are more considerations when copying an array that stores reference types rather than primitive types. The
+clone( ) method produces a shallow copy of the array, producing a new array whose cells refer to the same objects
+referenced by the first array.
+
+A **deep copy** of the contact list can be created by iteratively cloning the individual elements, as follows, but only
+if the Person class is declared as Cloneable.
+
+    Person[ ] guests = new Person[contacts.length];
+    for (int k=0; k < contacts.length; k++)
+    guests[k] = (Person) contacts[k].clone( ); // returns Object type
+
+> The first step to making a class cloneable in Java is declaring that it implements the Cloneable interface.
+> The remaining task is implementing a public version of the clone( ) method of the class
+
+
+By convention, that method should begin by creating a new instance using a call to super.clone( ). Because the inherited
+version returns an Object, we perform a narrowing cast to type SinglyLinkedList<E>. At this point in the execution, the
+other list has been created as a shallow copy of the original.
+
+Since our list class has two fields, size and head, the following assignments have been made:
+
+    other.size = this.size;
+    other.head = this.head;
+
+While the assignment of the size variable is correct, we cannot allow the new list to share the same head value (unless
+it is null). For a nonempty list to have an independent state, it must have an entirely new chain of nodes, each storing
+a reference to the corresponding element from the original list. We therefore create a new head node, and then perform a
+walk through the remainder of the original list while creating and linking new nodes for the new list.
+

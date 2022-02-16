@@ -1,19 +1,19 @@
 package Goodrich_Tamassia.Fundamental_DS.LinkedLists;
 
 public interface SinglyLinkedListInterface<E> {
-    public long size();
+    long size();
 
-    public boolean isEmpty();
+    boolean isEmpty();
 
-    public E first();
+    E first();
 
-    public E last();
+    E last();
 
-    public void addFirst(E element);
+    void addFirst(E element);
 
-    public void addLast(E element);
+    void addLast(E element);
 
-    public E removeFirst();
+    E removeFirst();
 
-//    public E removeLast();
+//  E removeLast();
 }
