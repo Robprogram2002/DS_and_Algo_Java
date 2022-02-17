@@ -1,6 +1,8 @@
 package Goodrich_Tamassia.Exceptions;
 
-public class EmptyException extends RuntimeException {
+import java.util.NoSuchElementException;
+
+public class EmptyException extends NoSuchElementException {
     public EmptyException(String errorMessage) {
         super(errorMessage);
     }

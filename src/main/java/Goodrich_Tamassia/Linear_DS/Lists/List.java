@@ -1,11 +1,9 @@
 package Goodrich_Tamassia.Linear_DS.Lists;
 
-
 import java.util.Iterator;
 
 /**
  * A simplified version of the java.util.List interface.
- *
  */
 public interface List<E> extends Iterable<E> {
     /**
