@@ -179,11 +179,10 @@ public class DynamicArrayDeque<E> implements Deque<E> {
      */
     public String toString() {
         StringBuilder sb = new StringBuilder("(");
-        int k = f;
-        for (int j = 0; j < this.n; j++) {
-            if (j > 0) sb.append(", ");
-            sb.append(data[k]);
-            k = (k + 1) % data.length;
+        sb.append(data[f]);
+        for (int i = f + 1; i < f + n; i++) {
+            sb.append(", ");
+            sb.append(data[i % data.length]);
         }
         sb.append(")");
         return sb.toString();
