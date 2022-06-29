@@ -3,6 +3,8 @@ package Sedgewick.chapter1.Simple_ADTs;
 import Sedgewick.libraries.StdOut;
 import Sedgewick.libraries.StdRandom;
 
+import java.util.Objects;
+
 public class Counter implements Comparable<Counter> {
     // To define data-type values (the state of each object), we declare instance variables
 
@@ -22,9 +24,27 @@ public class Counter implements Comparable<Counter> {
     // Java automatically invokes a constructor when a client program uses the keyword new. Overloaded constructors
     // are typically used to initialize instance variables to client-supplied values other than the defaults.
 
+    /**
+     * Create a counter with initial count to 0
+     *
+     * @param id String represented the name of the counter
+     */
     public Counter(String id) {
         this.name = id;
-        this.count = 0;
+    }
+
+    /**
+     * Create a counter with initial given count
+     *
+     * @param name  String represented the name of the counter
+     * @param count Initial count
+     */
+    public Counter(String name, int count) {
+        this(name);
+        if (count < 0) {
+            throw new IllegalArgumentException("initial count must be a non-negative integer");
+        }
+        this.count = count;
     }
 
     // implement data-type instance methods (the behavior of each object)
@@ -52,12 +72,25 @@ public class Counter implements Comparable<Counter> {
     @Override
     public int compareTo(Counter that) {
         // long form
-        if (this.count < that.count) return -1;
-        else if (this.count > that.count) return +1;
-        else return 0;
+        //  if (this.count < that.count) return -1;
+        //  else if (this.count > that.count) return +1;
+        //  else return 0;
 
         // Short form
-        // return Integer.compare(this.count, that.count);
+        return Integer.compare(this.count, that.count);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Counter counter = (Counter) o;
+        return count == counter.count;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(count);
     }
 
     /**
