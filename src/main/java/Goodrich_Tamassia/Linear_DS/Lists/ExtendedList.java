@@ -11,7 +11,7 @@ import java.util.function.Predicate;
  * @param <E> The type of elements in this list
  */
 public interface ExtendedList<E> extends Iterable<E>, Cloneable {
-    // Query Operations
+    // ------------------ Query Operations
 
     /**
      * Returns the number of elements in the list.
@@ -42,7 +42,7 @@ public interface ExtendedList<E> extends Iterable<E>, Cloneable {
      */
     Object[] toArray();
 
-    // update methods
+    // --------------- update methods
 
     /**
      * Appends the specified element to the end of this list (optional operation).
@@ -152,7 +152,7 @@ public interface ExtendedList<E> extends Iterable<E>, Cloneable {
      */
     void clear();
 
-    // Positional index operations
+    // -------------------- Positional index operations
 
     /**
      * Returns (but does not remove) the element at index i.
@@ -215,7 +215,7 @@ public interface ExtendedList<E> extends Iterable<E>, Cloneable {
      */
     int lastIndexOf(Object o);
 
-    // List Iterators
+    // ------------------ List Iterators
 
     /**
      * Returns an iterator over the elements in this list in proper sequence. The elements will be returned in order

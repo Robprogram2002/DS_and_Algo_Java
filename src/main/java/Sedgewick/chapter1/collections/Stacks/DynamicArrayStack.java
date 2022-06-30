@@ -6,8 +6,7 @@ import java.util.Iterator;
 
 public class DynamicArrayStack<Item> implements Stack<Item> {
 
-    private int size = 0;
-    private final DynamicArray<Item> data = new DynamicArray<Item>();
+    private final DynamicArray<Item> data = new DynamicArray<>();
 
     // create an empty stack
     public DynamicArrayStack() {
@@ -20,29 +19,27 @@ public class DynamicArrayStack<Item> implements Stack<Item> {
 
     @Override
     public int size() {
-        return this.size;
+        return this.data.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return size() == 0;
+        return this.data.is_empty();
     }
 
     @Override
     public void push(Item elem) {
         this.data.append(elem);
-        this.size += 1;
     }
 
     @Override
     public Item pop() {
-        this.size -= 1;
         return this.data.pop();
     }
 
     @Override
     public Item peek() {
-        return this.data.get(this.size-1);
+        return this.data.get(this.size() - 1);
     }
 
     @Override
@@ -58,7 +55,7 @@ public class DynamicArrayStack<Item> implements Stack<Item> {
     // iterate in a LIFO order
     private class ReverseArrayIterator implements Iterator<Item> {
         // Support LIFO iteration.
-        private int index = size;
+        private int index = data.size();
 
         @Override
         public boolean hasNext() {

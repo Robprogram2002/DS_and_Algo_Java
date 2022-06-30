@@ -140,7 +140,7 @@ public interface ExtendedDeque<E> extends Cloneable, Iterable<E> {
     boolean removeLastOccurrence(Object o);
 
     /**
-     * Adds all of the elements in the specified collection at the end of this deque, as if by calling addLast on each
+     * Adds all the elements in the specified collection at the end of this deque, as if by calling addLast on each
      * one, in the order that they are returned by the collection's iterator.
      *
      * @param c the elements to be inserted into this deque

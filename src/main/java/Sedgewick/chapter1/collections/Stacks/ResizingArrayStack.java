@@ -2,12 +2,13 @@ package Sedgewick.chapter1.collections.Stacks;
 
 import java.util.Iterator;
 
-/*
-implementation of our Stack API that resizes the array, allows
-clients to make stacks for any type of data, and supports client use of foreach to iterate
-through the stack items in LIFO order.
+/**
+ * implementation of our Stack API that resizes the array, allows
+ * clients to make stacks for any type of data, and supports client use of foreach to iterate
+ * through the stack items in LIFO order.
+ *
+ * @param <Item> Any reference type
  */
-
 public class ResizingArrayStack<Item> implements Stack<Item> {
 
     private Item[] array = (Item[]) new Object[10];     // stack items

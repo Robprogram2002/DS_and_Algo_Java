@@ -17,7 +17,7 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
      */
     private final static int DEFAULT_INITIAL_CAPACITY = 10;
 
-    // instance variables
+    // -------------------- instance variables
     /**
      * Generic array used for storage of Deque elements.
      */
@@ -42,6 +42,9 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
      */
     private boolean overflow = false;
 
+
+    // ------------- Constructors
+
     /**
      * Create a new empty deque with default initial capacity and without size restrictions.
      */
@@ -56,6 +59,7 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
      * @param initialCapacity The initial capacity of the empty deque.
      */
     public ExtendedArrayDeque(int initialCapacity) {
+        if (initialCapacity < 0) throw new IllegalArgumentException("initial capacity must be a non-negative integer");
         this.data = (E[]) new Object[initialCapacity];
         this.n = 0;
         this.f = 0;
@@ -81,6 +85,7 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
      * @param init An array whose elements will be used to initially populate the deque
      */
     public ExtendedArrayDeque(E[] init) {
+        if (init.length == 0) throw new IllegalArgumentException("the array given cannot be empty");
         data = (E[]) new Object[init.length * 2];
         for (int i = 0; i < init.length; i++) {
             data[i] = init[i];
@@ -98,10 +103,20 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
      *                      opposed end to liberate space
      */
     public ExtendedArrayDeque(E[] init, int maxCapacity, boolean allowOverflow) {
-        this(init);
+        if (maxCapacity < init.length)
+            throw new IllegalArgumentException("the maximum capacity must be greater or equal to " +
+                    "the length of the initial array");
+        this.data = (E[]) new Object[maxCapacity];
+        for (int i = 0; i < init.length; i++) {
+            data[i] = init[i];
+        }
+        this.n = init.length;
+        this.f = 0;
         this.max = maxCapacity;
         this.overflow = allowOverflow;
     }
+
+    // -----------------  Instance methods
 
     /**
      * Returns the number of elements in the deque.
@@ -180,12 +195,11 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
     public void addFirst(E e) throws FullException, ClassCastException {
         checkSizeRestriction();
 
-        if (n == data.length && max == null) {
-            resize(data.length * 2);
+        this.f = (f - 1) % data.length;
+        this.data[f] = e;
+        if (n == this.data.length && max != null) {
+            return;
         }
-
-        this.f = (f - 1 + data.length) % data.length;
-        data[f] = e;
         n++;
     }
 
@@ -198,16 +212,12 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
      */
     @Override
     public void addLast(E e) throws FullException, ClassCastException {
-        if (max != null && n == max) {
-            // deque is full
-            if (!overflow) throw new FullException("kjaks");
-            data[f] = e;
-            f = (f + 1) % data.length;
-            return;
-        }
+        checkSizeRestriction();
 
-        if (n == data.length && max == null) {
-            resize(data.length * 2);
+        if (n == this.data.length && max != null) {
+            this.data[f] = e;
+            this.f = (this.f + 1) % this.data.length;
+            return;
         }
 
         int tail = (f + n) % data.length;
@@ -340,6 +350,7 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
         for (int i = f + n - 1; i >= f; i--) {
             if (data[i % data.length].equals(o)) {
                 index = i;
+                break;
             }
         }
         if (index == -1) return false;
@@ -364,18 +375,17 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
     @Override
     public boolean addAll(Collection<? extends E> c) {
         if (max == null) {
-            if (n + c.size() > data.length) resize((n + c.size()) * 2);
+            if (n + c.size() > data.length) resize((n + c.size()) + DEFAULT_INITIAL_CAPACITY);
             int index = f + n;
             for (E e : c) {
                 data[index] = e;
                 index++;
             }
             n = n + c.size();
-            return true;
-        }
-
-        for (E e : c) {
-            this.offerLast(e);
+        } else {
+            for (E e : c) {
+                this.offerLast(e);
+            }
         }
         return true;
     }
@@ -402,7 +412,10 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
     public boolean contains(Object o) {
         boolean found = false;
         for (int i = f; i < n + f; i++) {
-            if (data[i % data.length].equals(o)) found = true;
+            if (data[i % data.length].equals(o)) {
+                found = true;
+                break;
+            }
         }
 
         return found;
@@ -430,7 +443,9 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
      */
     @Override
     public void rotate(int k) {
-        if (k > 1) {
+        if (k <= 0) {
+            throw new IllegalArgumentException("argument must be an integer greater or equal to one");
+        } else if (k > 1) {
             rotate(k - 1);
         }
 
@@ -439,6 +454,38 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
         data[(f + n) % data.length] = temp;
         f = (f + 1) % data.length;
     }
+
+
+    // --------------- Utility methods
+
+    private void checkEmpty() throws EmptyException {
+        if (isEmpty()) throw new EmptyException("Empty deque, there is no elements");
+    }
+
+    private void checkSizeRestriction() throws FullException {
+        if (n == this.data.length) {
+            if (max == null) {
+                resize(data.length * 2);
+            } else if (!overflow) {
+                throw new FullException("Cannot add new items, the deque is full");
+            }
+        }
+
+    }
+
+    /**
+     * Utility method to resize the length of the array use to  store the deque elements
+     *
+     * @param new_capacity integer representing the new capacity of the array
+     */
+    private void resize(int new_capacity) {
+        E[] new_array = (E[]) new Object[new_capacity];
+        for (int i = 0; i < this.n; i++) {
+            new_array[i] = data[(f + i) % data.length];
+        }
+        data = new_array;
+    }
+
 
     //---------------- nested Iterator class ----------------
 
@@ -467,14 +514,17 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
          * @throws NoSuchElementException if there are no further elements
          */
         public E next() throws NoSuchElementException {
-            if (j == n) throw new NoSuchElementException("No next element");
+            if (!hasNext()) {
+                throw new UnsupportedOperationException("there is not next element");
+            }
             E temp = data[(j + f) % data.length];
             j++;        // post-increment j, so it is ready for future call to next
             return temp;
         }
 
-    } //------------ end of nested ArrayIterator class ------------
+    }
 
+    //------------ end of nested ArrayIterator class ------------
 
     /**
      * Returns an iterator over the elements in this deque in proper sequence. The elements will be returned in order
@@ -521,8 +571,9 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
             return temp;
         }
 
-    } //------------ end of nested ArrayIterator class ------------
+    }
 
+    //------------ end of nested ArrayIterator class ------------
 
     /**
      * Returns an iterator over the elements in this deque in reverse sequential order. The elements will be returned
@@ -535,30 +586,8 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
         return new ReverseDequeIterator();
     }
 
-    private void checkEmpty() throws EmptyException {
-        if (isEmpty()) throw new EmptyException("Empty deque, there is no elements");
-    }
 
-    private void checkSizeRestriction() throws FullException {
-        if (max != null && n == max) {
-            // the deque is full
-            if (!overflow) throw new FullException("Cannot add new items, the deque is full");
-            n--;
-        }
-    }
-
-    /**
-     * Utility method to resize the length of the array use to  store the deque elements
-     *
-     * @param new_capacity integer representing the new capacity of the array
-     */
-    private void resize(int new_capacity) {
-        E[] new_array = (E[]) new Object[new_capacity];
-        for (int i = 0; i < this.n; i++) {
-            new_array[i] = data[(f + i) % data.length];
-        }
-        data = new_array;
-    }
+    // --------------  Inherited methods
 
     @Override
     public boolean equals(Object o) {
@@ -594,6 +623,11 @@ public class ExtendedArrayDeque<E> implements ExtendedDeque<E> {
         }
         sb.append(")");
         return sb.toString();
+    }
+
+
+    public static void main(String[] args) {
+        // test implementations
     }
 
 }

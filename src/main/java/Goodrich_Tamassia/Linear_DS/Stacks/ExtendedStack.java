@@ -63,8 +63,9 @@ public interface ExtendedStack<E> extends Cloneable, Iterable<E> {
      * in reverse order
      *
      * @param in_place whether the modifications would be made on the current stack or in a new instance.
+     * @return
      */
-    void reverse(Boolean in_place);
+    ExtendedStack<E> reverse(Boolean in_place);
 
 
     /**
@@ -73,5 +74,10 @@ public interface ExtendedStack<E> extends Cloneable, Iterable<E> {
      * @param T the stack that holds the elements to be appended
      */
     void extend(ExtendedStack<E> T);
+
+    /**
+     * Remove all the elements in the stack
+     */
+    void clear();
 
 }
