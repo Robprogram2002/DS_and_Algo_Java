@@ -7,7 +7,7 @@ public class StacksApplications {
      * A generic method for reversing an array.
      */
     public static <E> void reverse(E[] a) {
-        Stack<E> temp = new DynamicArrayStack<>();
+        ExtendedStack<E> temp = new DynamicArrayStack<>();
         for (E e : a) {
             temp.push(e);
         }
@@ -23,7 +23,7 @@ public class StacksApplications {
     public static boolean isMatched(String expression) {
         final String opening = "({[";  // opening delimiters
         final String ending = ")}]";   // respective closing delimiters
-        Stack<Character> temp = new DynamicArrayStack<>();
+        ExtendedStack<Character> temp = new DynamicArrayStack<>();
         for (char c :
                 expression.toCharArray()) {
             if (opening.indexOf(c) != -1) {  // this is an opening delimiter
@@ -44,7 +44,7 @@ public class StacksApplications {
      * Tests if every opening tag has a matching closing tag in HTML string.
      */
     public static boolean isHTMLMatched(String expression) {
-        Stack<String> temp = new DynamicArrayStack<>();
+        ExtendedStack<String> temp = new DynamicArrayStack<>();
         int j = expression.indexOf('<');
         while (j != -1) {
             int k = expression.indexOf('>', j + 1);

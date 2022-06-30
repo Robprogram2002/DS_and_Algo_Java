@@ -15,7 +15,8 @@ Most algorithms of interest involve organizing the data involved in the computat
 **data structures**, which also are central objects of study in computer science. Algorithms and data structures go hand
 in hand.
 
-> data structures exist as the byproducts or end products of algorithms and that we must therefore study them in order to understand the algorithms
+> data structures exist as the byproducts or end products of algorithms and that we must therefore study them in order
+> to understand the algorithms
 
 Simple algorithms can give rise to complicated data structures and, conversely, complicated algorithms can use simple
 data structures
@@ -26,7 +27,8 @@ millions of objects, it is not unusual to be able to make a program millions of 
 algorithm By contrast, investing additional money or time to buy and install a new computer holds the potential for
 speeding up a program by perhaps a factor of only 10 or 100.
 
-> Careful algorithm design is an extremely effective part of the process of solving a huge problem, whatever the applications area.
+> Careful algorithm design is an extremely effective part of the process of solving a huge problem, whatever the
+> applications area.
 
 The sharing of programs in computer systems is becoming more widespread, so although we might expect to be *using a
 large fraction of the algorithms* in this book, we also might expect to have to *implement only a small fraction* of
@@ -39,11 +41,89 @@ The choice of the best algorithm for a particular task can be a complicated proc
 mathematical analysis. The branch of computer science that comprises the study of such questions is called
 **analysis of algorithms**.
 
-> We should not use  an algorithm without having an idea of what resources it might consume, so we strive to be aware of how our algorithms might be expected to perform.
+> We should not use  an algorithm without having an idea of what resources it might consume, so we strive to be aware of
+> how our algorithms might be expected to perform.
 
 ### 1.1 Programming Model
 
-(...)
+**Basic structure of a Java program :** A Java program ( class) is either a library of static methods (functions) or a
+data type definition. To create libraries of static methods and data-type definitions we use the following components:
+
+* Primitive data types. Their definition includes the set of possible values and operations on those values, which can
+  be combined into expressions
+* Statements. We use six types of statements: declarations, assignments, conditionals, loops, calls, and returns.
+* Arrays allow us to work with multiple values of the same type.
+* Static methods allow us to encapsulate and reuse code and to develop programs as a set of independent modules.
+* Strings are sequences of characters. Some operations on them are built in to Java.
+* Input/output sets up communication between programs and the outside world.
+* Data abstraction extends encapsulation and reuse to allow us to define non-primitive data types, thus supporting
+  object-oriented programming.
+
+To invoke a Java program, we first compile it using the `javac` command, then run it using the `java` command. For
+example, to run BinarySearch, we first type the command `javac BinarySearch.java` (which creates a
+file `BinarySearch.class` that contains a lower-level version of the program in Java bytecode in the
+file `BinarySearch.class`). Then we type `java BinarySearch` (followed by a whitelist file name) to transfer control to
+the bytecode version of the program.
+
+A **data type** is a set of values and a set of operations on those values. A Java program manipulates variables that
+are named with identifiers. Each variable is associated with a data type and stores one of the permissible data-type
+values. In Java code, we use expressions like familiar mathematical expressions to apply the operations associated with
+each type.
+
+> For primitive types, we use *identifiers* to refer to variables, *operator symbols* such as + - * / to specify
+> operations, *literals* such as 1 or 3.14 to specify values, and expressions such as (x + 2.236)/2 to specify
+> operations on values.
+
+It is important to note that +, -, *, and / are *overloaded*—the same symbol specifies operations in multiple different
+types, depending on context. The key property of these primitive operations is that an operation involving values of a
+given type has a value of that type. This rule highlights the idea that we are often working with approximate values,
+since it is often the case that the exact value that would seem to be defined by the expression is not a value of the
+type. For example, 5/3 has the value 1 and 5.0/3.0 has a value very close to 1.66666666666667 but neither of these is
+exactly equal to 5/3.
+
+Type conversion. Numbers are automatically promoted to a more inclusive type if no information is lost. For example, in
+the expression 1 + 2.5 , the 1 is promoted to the double value 1.0 and the expression evaluates to the double value 3.5
+. A *cast* is a type name in parentheses within an expression, a directive to convert the following value into a value
+of that type. For example (int) 3.7 is 3 and (double) 3 is 3.0.
+
+*Declarations statements* create variables of a specified type and name them with identifiers at compile time.
+
+*Assignments statements* associate a data-type value (defined by an expression) with a variable. Java also has several
+implicit assignment idioms for changing the value of a data-type value relative to its current value, such as
+incrementing the value of an integer variable.
+
+**Arrays.** An array stores a sequence of values that are all the same type. To declare the array, you need to specify a
+name and the type of data it will contain. To create it, you need to specify its length (the number of values)
+. The reason that we need to explicitly create arrays at run time is that the Java compiler cannot know how much space
+to reserve for the array at compile time (as it can for primitive-type values). The for statement initializes the N
+array values
+
+When you begin to write code that uses an array, you must be sure that your code declares, creates, and initializes it.
+Omitting one of these steps is a common programming mistake.
+
+**Properties of methods.**
+
+* *Arguments are passed by value*. The only difference between an argument variable and a local variable is that the
+  argument variable is initialized with the argument value provided by the calling code. The method works with the value
+  of its arguments, not the arguments themselves. One consequence of this approach is that changing the value of an
+  argument variable within a static method has no effect on the calling code. The pass by-value convention implies that
+  array arguments are aliased the method uses the argument variable to refer to the caller’s array and can change the
+  contents of the array (though it cannot change the array itself)
+* *Method names can be overloaded.*
+* A method has a single return value but may have multiple return statements.
+* A method can have side effects. A method may use the keyword void as its return type, to indicate that it has no
+  return value.
+
+**Modular programming.** Of critical importance in this model is that libraries of static methods enable modular
+programming where we build libraries of static methods (modules) and a static method in one library can call static
+methods defined in other libraries. This approach has many important advantages. It allows us to
+
+* Work with modules of reasonable size, even in program involving a large amount of code
+* Share and reuse code without having to reimplement it
+* Easily substitute improved implementations
+* Develop appropriate abstract models for addressing programming problems Localize debugging
+
+##### APIs
 
 APIs A critical component of modular programming is documentation that explains the operation of library methods that
 are intended for use by others. We will consistently describe the library methods that we use in this book in
@@ -62,11 +142,27 @@ from implementation code gives us the freedom to substitute new and improved imp
 algorithms, this ability is an important ingredient in our ability to understand the impact of algorithmic improvements
 that we develop.
 
-###### Strings
+##### Strings
 
 A String is a sequence of characters (char values). A literal String is a sequence of characters within double quotes,
-such as "Hello, World". The data type String is a Java data type but it is not a primitive type. We consider String now
-because it is a fundamental data type that almost every Java program uses.
+such as "Hello, World". The data type String is a Java data type, but it is not a primitive type.
+
+**Conversion.** Two primary uses of strings are to convert values that we can enter on a keyboard into data-type values
+and to convert data-type values to values that we can read on a display. Java has built-in operations for String to
+facilitate these operations.
+
+    public class Integer 
+        static int parseInt(String s)    convert s to an int value 
+        static String toString(int i)    convert i to a String value
+    
+    public class Double 
+        static double parseDouble(String s) 
+        static String toString(double x)
+
+**Automatic conversion.** Java has a built-in mechanism that allows us to convert from any data type value to a String
+value by using concatenation: if one of the arguments of + is a String, Java automatically converts the other argument
+to a String (if it is not already a String). this mechanism enables conversion of any data-type value to a String, by
+concatenating it with the empty string "".
 
 ### 1.2 Data Abstraction
 
@@ -138,10 +234,21 @@ of client code at a higher level of abstraction. To develop client code, you nee
 create objects to hold datatype values, and provide access to the values for instance methods to operate on them. These
 processes are different from the corresponding processes for primitive types, though you will notice many similarities.
 
-**Objects.** A *reference* is a mechanism for accessing an object. Java nomenclature makes clear the distinction from
-primitive types (where variables are associated with values) by using the term *reference types* for nonprimitive types.
-The details of implementing references vary in Java implementations, but it is useful to think of a reference as a
-memory address,
+**Objects.**
+
+an object is an entity that can take on a data-type value. Objects are characterized by three essential properties:
+state, identity, and behavior. The **state** of an object is a value from its data type. The **identity** of an object
+distinguishes one object from another. It is useful to think of an object’s identity as the place where its value is
+stored in memory. The **behavior** of an object is the effect of data-type operations. The implementation has the sole
+responsibility for maintaining an object’s identity, so that client code can use a data type without regard to the
+representation of its state by conforming to an API that describes an object’s behavior. An object’s state might be used
+to provide information to a client or cause a side effect or be changed by one of its data type’s operations, but the
+details of the representation of the data-type value are not relevant to client code.
+
+A *reference* is a mechanism for accessing an object. Java nomenclature makes clear the distinction from primitive
+types (where variables are associated with values) by using the term *reference types* for nonprimitive types. The
+details of implementing references vary in Java implementations, but it is useful to think of a reference as a memory
+address,
 
 Each data-type value is stored in an object. A constructor has no return type because it always returns a reference to
 an object of its data type. Each time that a client uses new(), the system
@@ -190,6 +297,11 @@ returns multiple values.
 
 **Arrays are objects**. In Java, every value of any nonprimitive type is an object. In particular, arrays are objects.
 
+When we create an array of objects, we do so in two steps:
+
+* Create the array, using the bracket syntax for array constructors.
+* Create each object in the array, using a standard constructor for each.
+
 An array of objects in Java is an array of references to objects, not the objects themselves. If the objects are large,
 then we may gain efficiency by not having to move them around, just their references. If they are small, we may lose
 efficiency by having to follow a reference each time we need to get to some information.
@@ -237,6 +349,14 @@ essentially self-documenting and lead immediately to easily understood client co
 Of course, we can define APIs for other geometric objects such as line segments, triangles, polygons, circles, and so
 forth, though implementing operations on them can be challenging.
 
+**Information processing.** The idea is to define data types that allow us to keep information in objects that
+correspond to things in the real world. The focus of such data types is on encapsulating the data, while at the same
+time enabling the development of client code that does not depend on the representation of the data.
+
+> Whenever you have data of different types that logically belong together, it is worthwhile to contemplate defining an
+> ADT as in these examples. The ability to do so helps to organize the data, can greatly simplify client code in typical
+> applications, and is an important step on the road to data abstraction.
+
 ###### Implementing an abstract data type
 
 The first statements in the file declare instance variables that define the data-type values. Following the instance
@@ -280,6 +400,9 @@ we think about the needs of a client, then accommodate them in an ADT, following
 
 What operations do clients need to perform, and what data-type values can best support those operations? These basic
 decisions are at the heart of every implementation that we develop.
+
+> One of the key advantages of using data abstraction in our implementations is that we can normally change from one
+> implementation to another without changing any client code.
 
 ###### More ADT implementations
 
@@ -356,6 +479,28 @@ being the only point of dependence between client and implementation. You do not
 implemented in order to use it and you can assume that a client knows nothing but the API when implementing a data type.
 Encapsulation is the key to attaining both of these advantages.
 
+**Designing APIs**. One of the most important and most challenging steps in building modern software is designing APIs.
+This task takes practice, careful deliberation, and many iterations, but any time spent designing a good API is certain
+to be repaid in time saved debugging or code reuse.
+
+there are numerous pitfalls that every API design is susceptible to:
+
+* An API may be too hard to implement, implying implementations that are difficult or impossible to develop.
+* An API may be too hard to use, leading to client code that is more complicated than it would be without the API.
+* An API may be too narrow, omitting methods that clients need.
+* An API may be too wide, including a large number of methods not needed by any client. This pitfall is perhaps the most
+  common, and one of the most difficult to avoid. The size of an API tends to grow over time because it is not difficult
+  to add methods to an existing API, but it is difficult to remove methods without breaking existing clients.
+* An API may be too general, providing no useful abstractions.
+* An API may be too specific, providing abstractions so detailed or so diffuse as to be useless.
+* An API may be too dependent on a particular representation, therefore not serving the purpose of freeing client code
+  from the details of using that representation. This pitfall is also difficult to avoid, because the representation is
+  certainly central to the development of the implementation.
+
+These considerations are sometimes summarized in
+
+> provide to clients the methods they need and no others.
+
 **Algorithms and ADTs.** Data abstraction is naturally suited to the study of algorithms, because it helps us provide a
 framework within which we can precisely specify both what an algorithm needs to accomplish and how a client can make use
 of an algorithm. Typically, in this book, an algorithm is an implementation of an instance method in an abstract data
@@ -380,11 +525,14 @@ and then referred to the interface in our implementation code
     }
 
 so that the Java compiler will check that it matches the interface. This arrangement is known as *interface inheritance*
-—an implementing class inherits the interface. Interface inheritance allows us to *write client programs that can
-manipulate objects of any type that implements the interface* (even a type to be created in the future), by invoking
-methods in the interface. We might have used interface inheritance in place of our more informal APIs, but chose not to
-do so to avoid dependence on specific high-level language mechanisms that are not critical to the understanding of
-algorithms and to avoid the extra baggage of interface files.
+—an implementing class inherits the interface.
+
+> Interface inheritance allows us to *write client programs that can manipulate objects of any type that implements the
+> interface* (even a type to be created in the future), by invoking methods in the interface.
+
+We might have used interface inheritance in place of our more informal APIs, but chose not to do so to avoid dependence
+on specific high-level language mechanisms that are not critical to the understanding of algorithms and to avoid the
+extra baggage of interface files.
 
 **Implementation inheritance**. Java also supports another inheritence mechanism known as *subclassing*, which is a
 powerful technique that enables a programmer to change behavior and add functionality without rewriting an entire class
@@ -401,7 +549,7 @@ inheritance are debatable), and we avoid it in this book because it generally wo
 ###### Memory management.
 
 The ability to assign a new value to a reference variable creates the possibility that a program may have created an
-object that can no longer be referenced. Such an object is said to be orphaned. Objects are also orphaned when they go
+object that can no longer be referenced. Such an object is said to be *orphaned*. Objects are also orphaned when they go
 out of scope Accordingly, programming languages and systems need mechanisms to allocate memory for data-type values
 during the time they are needed and to free the memory when they are no longer needed (for an object, sometime after it
 is orphaned). Memory management turns out to be easier for primitive types because all of the information needed for
@@ -633,10 +781,11 @@ again until we get a single value. For example, the algorithm computes the same 
 The name Item is a **type parameter**, a *symbolic placeholder* for some concrete type to be used by the client. You can
 read FixedCapacityStack<Item> as *stack of items*, which is precisely what we want. When implementing
 FixedCapacityStack, we do not know the actual type of Item, but a client can use our stack for any type of data by
-providing a concrete type when the stack is created. Concrete types must be reference types, but clients can depend on
-autoboxing to convert primitive types to their corresponding wrapper types. Java uses the type parameter Item to check
-for type mismatch errors—even though no concrete type is yet known, variables of type Item must be assigned values of
-type Item, and so forth
+providing a concrete type when the stack is created.
+
+> Concrete types must be reference types, but clients can depend on autoboxing to convert primitive types to their
+> corresponding wrapper types. Java uses the type parameter Item to check for type mismatch errors—even though no
+> concrete type is yet known, variables of type Item must be assigned values of type Item, and so forth
 
 For historical and technical reasons beyond our scope, *generic array creation is disallowed in Java*. Instead, we need
 to use a cast:
@@ -680,6 +829,9 @@ Iterator is not part of java.lang (even though Iterable is part of java.lang)
 > This arrangement is of critical importance for implementations of fundamental data types  it frees us to switch to
 > a totally different representation without having to change any client code. More important, taking the client’s
 > point of view, it allows clients to use iteration without having to know any details of the class implementation
+
+Note that nested classes can access the instance variables of the enclosing class (this ability is the main reason we
+use nested classes for iterators).
 
 In the context of the study of algorithms, Algorithm 1.1 is significant because it almost (but not quite) achieves
 optimum performance goals for any collection implementation:
