@@ -30,6 +30,23 @@ public class Transaction implements Comparable<Transaction> {
     }
 
     /**
+     * Initializes a new transaction by parsing a string of the form NAME DATE AMOUNT.
+     *
+     * @param transaction the string to parse
+     * @throws IllegalArgumentException if {@code amount}
+     *                                  is {@code Double.NaN}, {@code Double.POSITIVE_INFINITY},
+     *                                  or {@code Double.NEGATIVE_INFINITY}
+     */
+    public Transaction(String transaction) {
+        String[] a = transaction.split("\\s+");
+        this.customer = a[0];
+        this.date = new Date(a[1]);
+        this.amount = Double.parseDouble(a[2]);
+        if (Double.isNaN(amount) || Double.isInfinite(amount))
+            throw new IllegalArgumentException("Amount cannot be NaN or infinite");
+    }
+
+    /**
      * @return customer name for this transaction
      */
     public String getCustomer() {
@@ -55,7 +72,9 @@ public class Transaction implements Comparable<Transaction> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Transaction that = (Transaction) o;
-        return Double.compare(that.getAmount(), getAmount()) == 0 && getCustomer().equals(that.getCustomer()) && getDate().equals(that.getDate());
+        return Double.compare(that.getAmount(), getAmount()) == 0
+                && getCustomer().equals(that.getCustomer())
+                && getDate().equals(that.getDate());
     }
 
     @Override
@@ -73,8 +92,16 @@ public class Transaction implements Comparable<Transaction> {
         return sb.toString();
     }
 
-    @Override
-    public int compareTo(@NotNull Transaction o) {
-        return 0;
+    /**
+     * Compares two transactions by amount.
+     *
+     * @param that the other transaction
+     * @return { a negative integer, zero, a positive integer}, depending
+     * on whether the amount of this transaction is { less than,
+     * equal to, or greater than } the amount of that transaction
+     */
+    public int compareTo(Transaction that) {
+        return Double.compare(this.amount, that.amount);
     }
+
 }
