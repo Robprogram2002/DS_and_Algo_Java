@@ -2,6 +2,9 @@ package Goodrich_Tamassia.Linear_DS.Queues;
 
 import Goodrich_Tamassia.Fundamental_DS.LinkedLists.CircularLinkedList;
 import Goodrich_Tamassia.Fundamental_DS.LinkedLists.CircularLinkedListInterface;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Iterator;
 
 /**
  * Implementation of a Queue as an adaptation of a CircularLinkedList.
@@ -98,4 +101,14 @@ public class CircularLinkedQueue<E> implements CircularQueue<E> {
 
     }
 
+    /**
+     * Returns an iterator over elements of type {@code T}.
+     *
+     * @return an Iterator.
+     */
+    @NotNull
+    @Override
+    public Iterator<E> iterator() {
+        return null;
+    }
 }

@@ -2,6 +2,8 @@ package Sedgewick.chapter1.collections.Stacks;
 
 import Sedgewick.chapter1.collections.LinkedLists.LinkedList;
 import Sedgewick.chapter1.collections.LinkedLists.SingleLinkedList;
+import Sedgewick.libraries.StdIn;
+import Sedgewick.libraries.StdOut;
 
 import java.util.Iterator;
 
@@ -83,6 +85,15 @@ public class LinkedListStack<Item> implements Stack<Item> {
         System.out.println(my_stack);
 
         for (int item : my_stack) System.out.println(item);
+
+//
+//        LinkedListStack<String> s = new LinkedListStack<String>();
+//        while (!StdIn.isEmpty()) {
+//            String item = StdIn.readString();
+//            if (!item.equals("-")) s.push(item);
+//            else if (!s.isEmpty()) StdOut.print(s.pop() + " ");
+//        }
+//        StdOut.println("(" + s.size() + " left on stack)");
     }
 
 }

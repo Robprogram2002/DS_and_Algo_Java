@@ -1,6 +1,5 @@
 package Goodrich_Tamassia.Fundamental_DS.LinkedLists;
 
-import java.util.Objects;
 
 public class SinglyLinkedList<E> implements SinglyLinkedListInterface<E>, Cloneable {
 

@@ -21,6 +21,12 @@ public class DoublyLinkedList<T> implements LinkedList<T> {
             this.prev = prev;
         }
 
+        public Node(T data) {
+            this.data = data;
+            this.next = null;
+            this.prev = null;
+        }
+
         @Override
         public String toString() {
             return data.toString();
@@ -50,7 +56,7 @@ public class DoublyLinkedList<T> implements LinkedList<T> {
             current_node.data = null;
             current_node = next;
         }
-        head = tail = current_node = null;
+        head = tail = null;
         size = 0;
     }
 
@@ -81,8 +87,14 @@ public class DoublyLinkedList<T> implements LinkedList<T> {
     // Add an element at a specified index
     @Override
     public void insert(int index, T new_item) throws IndexOutOfBoundsException {
-        if (index == 0) add(new_item);              // add at the beginning O(1)
-        if (index == size - 1) append(new_item);    // add at the end O(1)
+        if (index == 0) { // add at the beginning O(1)
+            add(new_item);
+            return;
+        }
+        if (index == size - 1) {
+            append(new_item);   // add at the end O(1)
+            return;
+        }
 
         // traverse to get the node at the index received O(n/2)
         Node<T> current_node = find_node_by_index(index);
@@ -176,7 +188,18 @@ public class DoublyLinkedList<T> implements LinkedList<T> {
 
     @Override
     public boolean search(T value) {
-        return false;
+        Node<T> current_node = this.head;
+        boolean found = false;
+
+        while (current_node != null && !found) {
+            if (current_node.data == value) {
+                found = true;
+            } else {
+                current_node = current_node.next;
+            }
+
+        }
+        return found;
     }
 
     // Find the index of a particular value in the linked list, O(n)

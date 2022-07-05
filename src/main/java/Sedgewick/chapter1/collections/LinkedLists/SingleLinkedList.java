@@ -38,7 +38,9 @@ public class SingleLinkedList<Item> implements LinkedList<Item> {
 
     @Override
     public void clear() {
-
+        this.head = null;
+        this.tail = null;
+        this.size = 0;
     }
 
     @Override
@@ -46,14 +48,12 @@ public class SingleLinkedList<Item> implements LinkedList<Item> {
         Node<Item> new_node = new Node<Item>(new_item);
         if (is_empty()) {
             // first node is also the last node
-            this.head = new_node;
             this.tail = new_node;
         } else {
             // there is already a first node
             new_node.next = this.head;
-            this.head = new_node;
         }
-
+        this.head = new_node;
         this.size += 1;
     }
 
@@ -89,7 +89,7 @@ public class SingleLinkedList<Item> implements LinkedList<Item> {
                 if (count == index) {
                     prev_node.next = new_node;
                     new_node.next = current_node;
-                    return;
+                    break;
                 } else {
                     prev_node = current_node;
                     current_node = current_node.next;
@@ -179,32 +179,23 @@ public class SingleLinkedList<Item> implements LinkedList<Item> {
 
         Node<Item> current_node = this.head;
         Node<Item> prev_node = null;
-        boolean found = false;
 
-        while (current_node != null && !found) {
+        while (current_node != null) {
             if (current_node.data == value) {
-                found = true;
+                if (prev_node == null) {
+                    removeHead();  // remove the first element
+                } else if (current_node.next == null) {
+                    removeTail();   // remove the last item
+                } else {
+                    prev_node.next = current_node.next;  // remove an item in between
+                }
+                return true;
             } else {
                 prev_node = current_node;
                 current_node = current_node.next;
             }
         }
-
-        if (found) {
-            if (prev_node == null) {
-                // remove the first element
-                removeHead();
-            } else if (current_node.next == null) {
-                // remove the last item
-                removeTail();
-            } else {
-                // remove an item in between
-                prev_node.next = current_node.next;
-            }
-            return true;
-        } else {
-            return false;
-        }
+        return false;
 
     }
 

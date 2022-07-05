@@ -2,6 +2,8 @@ package Sedgewick.chapter1.collections.Queues;
 
 import Sedgewick.chapter1.collections.LinkedLists.DoublyLinkedList;
 import Sedgewick.chapter1.collections.LinkedLists.LinkedList;
+import Sedgewick.libraries.StdIn;
+import Sedgewick.libraries.StdOut;
 
 import java.util.Iterator;
 
@@ -54,5 +56,17 @@ public class LinkedListQueue<T> implements Queue<T> {
     @Override
     public Iterator<T> iterator() {
         return list.iterator();
+    }
+
+
+    public static void main(String[] args) {
+        // Create a queue and enqueue/dequeue strings.
+        Queue<String> q = new LinkedListQueue<>();
+        while (!StdIn.isEmpty()) {
+            String item = StdIn.readString();
+            if (!item.equals("-")) q.enqueue(item);
+            else if (!q.isEmpty()) StdOut.print(q.dequeue() + " ");
+        }
+        StdOut.println("(" + q.size() + " left on queue)");
     }
 }

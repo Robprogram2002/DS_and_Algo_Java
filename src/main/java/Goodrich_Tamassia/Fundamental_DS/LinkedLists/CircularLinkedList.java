@@ -1,7 +1,5 @@
 package Goodrich_Tamassia.Fundamental_DS.LinkedLists;
 
-import java.util.Objects;
-
 public class CircularLinkedList<E> implements CircularLinkedListInterface<E> {
     // instance variables of the CircularLinkedList class
     /**
