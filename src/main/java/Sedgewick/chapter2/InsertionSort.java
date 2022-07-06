@@ -20,6 +20,14 @@ public class InsertionSort {
         }
     }
 
+    public static void sort(Comparable[] a, int lo, int hi) {
+        // sort a[lo...hi] into increasing order
+        for (int i = lo; i <= hi; i++) {
+            for (int j = i; j > 0 && less(a[j], a[j - 1]); j--)
+                exch(a, j, j - 1);
+        }
+    }
+
     // using an optimized version of insertion sort (with half exchanges and a sentinel).
     // In the worst case, this implementation makes ~ 1/2 n^2 compares to sort an array of length n.
     // So, it is not suitable for sorting large arrays (unless the number of inversions is small)
@@ -49,7 +57,6 @@ public class InsertionSort {
             a[j] = v;
         }
 
-        assert isSorted(a);
     }
 
     private static boolean less(Comparable v, Comparable w) {
