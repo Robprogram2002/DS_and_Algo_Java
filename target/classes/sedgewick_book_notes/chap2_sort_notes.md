@@ -421,17 +421,430 @@ futile—*no such algorithm exists*. It is an extremely strong statement that ap
 algorithm.
 
 Proposition H asserts that the number of compares used by mergesort in the worst case is ~ N lg N. This result is an
-*upper bound* on the difficulty of the sorting problem in the sense that a better algorithm would have to guarantee to use
-a smaller number of compares. Proposition I asserts that no sorting algorithm can guarantee to use fewer than ~ N lg N
-compares. It is a *lower bound* on the difficulty of the sorting problem in the sense that even the best possible
+*upper bound* on the difficulty of the sorting problem in the sense that a better algorithm would have to guarantee to
+use a smaller number of compares. Proposition I asserts that no sorting algorithm can guarantee to use fewer than ~ N lg
+N compares. It is a *lower bound* on the difficulty of the sorting problem in the sense that even the best possible
 algorithm must use at least that many compares in the worst case. Together, they imply:
 
 > **Proposition J.** Mergesort is an asymptotically optimal compare-based sorting algorithm.
 
 > **Proof:** Precisely, we mean by this statement that *both the number of compares used by mergesort in the worst case
-> and the minimum number of compares that any compare-based sorting algorithm can guarantee are ~N lg N*. Propositions H 
-> and I establish these facts. 
+> and the minimum number of compares that any compare-based sorting algorithm can guarantee are ~N lg N*. Propositions H
+> and I establish these facts.
 
 ## 2.3 Quicksort
 
+Quicksort is popular because it is not difficult to implement, works well for a variety of different kinds of input
+data, and is substantially faster than any other sorting method in typical applications. The quicksort algorithm’s
+desirable features are that it is in-place (uses only a small auxiliary stack) and that it requires time proportional to
+N log N on the average to sort an array of length N
 
+Its primary drawback is that it is fragile in the sense that some care is involved in the implementation to be sure to
+avoid bad performance.
+
+**The basic algorithm.** Quicksort is a divide-and-conquer method for sorting. It works by partitioning an array into
+two subarrays, then sorting the subarrays independently. Quicksort is complementary to mergesort: for mergesort, we
+break the array into two subarrays to be sorted and then combine the ordered subarrays to make the whole ordered array;
+for quicksort, we rearrange the array such that, when the two subarrays are sorted, the whole array is ordered. In the
+first instance, we do the two recursive calls before working on the whole array; in the second instance, we do the two
+recursive calls after working on the whole array. For mergesort, the array is divided in half; for quicksort, the
+position of the partition depends on the contents of the array.
+
+The crux of the method is the partitioning process, which rearranges the array to make the following three conditions
+hold:
+
+* The entry a[j] is in its final place in the array, for some j.
+* No entry in a[lo] through a[j-1] is greater than a[j].
+* No entry in a[j+1] through a[hi] is less than a[j].
+
+We achieve a complete sort by partitioning, then recursively applying the method.
+
+Because the partitioning process always fixes one item into its position, a formal proof by induction that the recursive
+method constitutes a proper sort is not difficult to develop: if the left subarray and the right subarray are both
+properly sorted, then the result array, made up of the left subarray (in order, with no entry larger than the
+partitioning item), the partitioning item, and the right subarray (in order, with no entry smaller that the partitioning
+item), is in order.
+
+It is a randomized algorithm, because it randomly shuffles the array before sorting it. Our reason for doing so is to be
+able to predict (and depend upon) its performance characteristics.
+
+**Partitioning.** We use the following general strategy: First, we arbitrarily choose a[lo] to be the partitioning
+item—the one that will go into its final position. Next, we scan from the left end of the array until we find an entry
+greater than (or equal to) the partitioning item, and we scan from the right end of the array until we find an entry
+less than (or equal to) the partitioning item. The two items that stopped the scans are out of place in the final
+partitioned array, so we exchange them. Continuing in this way, we ensure that no array entries to the left of the left
+index i are greater than the partitioning item, and no array entries to the right of the right index j are less than the
+partitioning item. When the scan indices cross, all that we need to do to complete the partitioning process is to
+exchange the partitioning item a[lo] with the rightmost entry of the left subarray (a[j]) and return its index j.
+
+##### Possible issues
+
+**Partitioning in place.** If we use an extra array, partitioning is easy to implement, but not so much easier that it
+is worth the extra cost of copying the partitioned version back into the original
+
+**Staying in bounds.** If the smallest item or the largest item in the array is the partitioning item, we have to take
+care that the pointers do not run off the left or right ends of the array, respectively. Our partition() implementation
+has explicit tests to guard against this circumstance
+
+**Preserving randomness.** The random shuffle puts the array in random order. Since it treats all items in the subarrays
+uniformly, the implementation has the property that its two subarrays are also in random order. This fact is crucial to
+the predictability of the algorithm’s running time. . An alternate way to preserve randomness is to choose a random item
+for partitioning within partition().
+
+**Terminating the loop.** Properly testing whether the pointers have crossed is a bit trickier than it might seem at
+first glance. A common error is to fail to take into account that the array might contain other items with the same key
+value as the partitioning item.
+
+**Handling items with keys equal to the partitioning item’s key.** It is best to stop the left scan for items with keys
+greater than or equal to the partitioning item’s key and the right scan for items with key less than or equal to the
+partitioning item’s key. Even though this policy might seem to create unnecessary exchanges involving items with keys
+equal to the partitioning item’s key, it is crucial to avoiding quadratic running time in certain typical applications
+
+##### Performance characteristics
+
+The inner loop of quicksort (in the partitioning method) increments an index and compares an array entry against a fixed
+value. This simplicity is one factor that makes quicksort quick: it is hard to envision a shorter inner loop in a
+sorting algorithm. For example, mergesort and shellshort are typically slower than quicksort because they also do data
+movement within their inner loops.
+
+The second factor that makes quicksort quick is that it uses few compares. Ultimately, the efficiency of the sort
+depends on how well the partitioning divides the array, which in turn depends on the value of the partitioning item’s
+key. Partitioning divides a large randomly ordered array into two smaller randomly ordered subarrays, but the actual
+split is equally likely (for distinct keys) to be anywhere in the array.
+
+The best case for quicksort is when each partitioning stage divides the array exactly in half. This circumstance would
+make the number of compares used by quicksort satisfy the divide-and-conquer recurrence `C_N = 2 C_{N/2} + N`.
+The `2C_{N/2}` term covers the cost of sorting the two subarrays; the N is the cost of examining each entry, using one
+partitioning index or the other
+
+we know that this recurrence has the solution `CN ~ N lg N`. Although things do not always go this well, it is true that
+the partition falls in the middle on the average. Taking into account the precise probability of each partition position
+makes the recurrence more complicated and more difficult to solve, but the final result is similar. The proof of this
+result is the basis for our confidence in quicksort.
+
+> **Proposition K.** Quicksort uses `~ 2N ln N` compares (and one-sixth that many exchanges) on the average to sort an
+> array of length N with distinct keys.
+
+When keys may not be distinct, as is typical in practical applications, precise analysis is considerably more
+complicated, but it is not difficult to show that the average number of compares is no greater than CN , even when
+duplicate keys may be present.
+
+the basic quicksort program has one potential liability: it can be extremely inefficient if the partitions are
+unbalanced. For example, it could be the case that the first partition is on the smallest item, the second partition on
+the next smallest item, and so forth, so that the program will remove just one item for each call, leading to an
+excessive number of partitions of large subarrays. Avoiding this situation is the primary reason that we randomly
+shuffle the array before using quicksort. This action makes it so unlikely that bad partitions will happen consistently
+that we need not worry about the possibility.
+
+> **Proposition L.** Quicksort uses `~ N^2 / 2` compares in the worst case, but random shuffling protects against this
+> case.
+
+quicksort is typically faster than mergesort because (even though it does 39 percent more compares) it does much less
+data movement.
+
+##### Algorithm improvements
+
+> Quicksort was invented in 1960 by C. A. R. Hoare
+
+the algorithm is so well-balanced that the effects of improvements can be more than offset by unexpected side effects,
+but a few of them, which we now consider, are quite effective. As noted, you need to run experiments to determine the
+effectiveness of these improvements and to determine the best choice of parameters for your implementation.
+
+**Cutoff to insertion sort.** As with most recursive algorithms, an easy way to improve the performance of quicksort is
+based on the following two observations:
+
+* Quicksort is slower than insertion sort for tiny subarrays.
+* Being recursive, quicksort’s sort() is certain to call itself for tiny subarrays.
+
+Accordingly, it pays to switch to insertion sort for tiny subarrays. The optimum value of the cutoff M is
+system-dependent, but any value between 5 and 15 is likely to work well in most situations
+
+**Median-of-three partitioning.** A second easy way to improve the performance of quicksort is to use the median of a
+small sample of items taken from the subarray as the partitioning item. Doing so will give a slightly better partition,
+but at the cost of computing the median. It turns out that most of the available improvement comes from choosing a
+sample of size 3 and then partitioning on the middle item. As a bonus, we can use the sample items as sentinels at the
+ends of the array and remove both array bounds tests in partition().
+
+Entropy-optimal sorting. Arrays with large numbers of duplicate keys arise frequently in applications. In such
+situations, the quicksort implementation that we have considered has acceptable performance, but it can be substantially
+improved. For example, a subarray that consists solely of items that are equal (just one key value) does not need to be
+processed further, but our implementation keeps partitioning down to small subarrays. In a situation where there are
+large numbers of duplicate keys in the input array, the recursive nature of quicksort ensures that subarrays consisting
+solely of items with keys that are equal will occur often. There is potential for significant improvement, from the
+linearithmic-time performance of the implementations seen so far to linear-time performance.
+
+One straightforward idea is to partition the array into three parts, one each for items with keys smaller than, equal
+to, and larger than the partitioning item’s key. Various different methods have been suggested for the task.
+
+Dijkstra’s solution it is based on a single left-to-right pass through the array that maintains a pointer lt such that
+a[lo..lt-1] is *less than v*, a pointer gt such that a[gt+1, hi] is *greater than v*, and a pointer i such that
+a[lt..i-1] are *equal to v* and a[i..gt] are *not yet examined*.
+
+Starting with `i` equal to `lo`, we process a[i] using the 3-way comparison given us by the Comparable interface (
+instead of using less()) to directly handle the three possible cases:
+
+* a[i] less than v: exchange a[lt] with a[i] and increment both lt and i
+* a[i] greater than v: exchange a[i] with a[gt] and decrement gt
+* a[i] equal to v: increment i.
+
+Each of these operations both maintains the invariant and decreases the value of gt-i (so that the loop terminates).
+Furthermore, every item encountered leads to an exchange except for those items with keys equal to the partitioning
+item’s key.
+
+Though this code was developed not long after quicksort in the 1970s, it fell out of favor because it uses many more
+exchanges than the standard 2-way partitioning method for the common case when the number of duplicate keys in the array
+is not high.
+
+1990s J. Bentley and D. McIlroy developed a clever implementation that overcomes this problem, and observed that 3-way
+partitioning makes quicksort asymptotically faster than mergesort and other methods in practical situations involving
+large numbers of equal keys.
+
+Mergesort does not guarantee optimal performance for any given distribution of duplicates in the input: for example,
+mergesort is linearithmic for a randomly ordered array that has only a constant number of distinct key values, but
+quicksort with 3-way partitioning is linear for such an array.
+
+> quicksort with 3-way partitioning is entropy-optimal, in the sense that the average number of compares used by the best
+> possible compare-based sorting algorithm and the average number of compares used by 3-way quicksort are within a
+> constant factor of one another, for any given distribution of input key values
+
+As with standard quicksort, the running time tends to the average as the array size grows, and large deviations from the
+average are extremely unlikely, so that you can depend on 3-way quicksort’s running time to be proportional to N times
+the entropy of the distribution of input key values. This property of the algorithm is important in practice because it
+reduces the time of the sort from linearithmic to linear for arrays with large numbers of duplicate keys.
+
+The order of the keys is immaterial, because the algorithm shuffles them to protect against the worst case. The
+distribution of keys defines the entropy and no compare-based algorithm can use fewer compares than defined by the
+entropy. This ability to adapt to duplicates in the input makes 3-way quicksort the algorithm of choice for a library
+sort—clients that sort arrays containing large numbers of duplicate keys are not unusual.
+
+## 2.4 PRIORITY QUEUES
+
+Many applications require that we process items having keys in order, but not necessarily in full sorted order and not
+necessarily all at once. Often, we collect a set of items, then process the one with the largest key, then perhaps
+collect more items, then process the one with the current largest key, and so forth.
+
+An appropriate data type in such an environment supports two operations: remove the maximum and insert. Such a data type
+is called a **priority queue**.
+
+We use the method names `delMax()` for remove the maximum and `insert()` for insert. By convention, we will compare keys
+only with a helper less() method, as we have been doing for sorting. Thus, if items can have duplicate keys, maximum
+means any item with the largest key value
+
+For flexibility, we use a generic implementation with a parameterized type Key that implements the Comparable interface.
+This choice eliminates our distinction between items and keys and enables clearer and more compact descriptions of data
+structures and algorithms. For example, we refer to the “largest key” instead of the “largest item” or the “item with
+the largest key.”
+
+the API includes three constructors, which enable clients to build priority queues of an initial fixed size (perhaps
+initialized with a given array of keys). To clarify client code, we will use a separate class MinPQ whenever
+appropriate, which is the same as MaxPQ except that it has a delMin() method that deletes and returns an item with the
+smallest key in the queue. Any MaxPQ implementation is easily converted into a MinPQ implementation and vice versa,
+simply by reversing the sense of the comparison in less().
+
+        public class MaxPQ< Key extends Comparable<Key>> 
+            MaxPQ()             create a priority queue
+            MaxPQ(int max)      create a priority queue of initial capacity max 
+            MaxPQ(Key[] a)      create a priority queue from the keys in a[]
+            void insert(Key v)  insert a key into the priority queue 
+            Key max()           return the largest key 
+            Key delMax()        return and remove the largest key
+            boolean isEmpty()   is the priority queue empty? 
+            int size()          number of keys in the priority queue
+
+**A priority-queue client.** To appreciate the value of the priority-queue abstraction, consider the following problem:
+You have a huge input stream of N strings and associated integer values, and your task is to find the largest or
+smallest M integers (and associated strings) in the input stream. In some applications, the size of the input stream is
+so huge that it is best to consider it to be unbounded. One way to address this problem would be to sort the input
+stream and take the M largest keys from the result, but we have just stipulated that the input stream is too large for
+that. Another approach would be to compare each new key against the M largest seen so far, but that is also likely to be
+prohibitively expensive unless M is small.
+
+With priority queues, we can solve the problem provided that we can develop efficient implementations of both insert()
+and delMin().
+
+#### Elementary implementations
+
+The basic data structures that we discussed in Chapter 1 provide us with four immediate starting points for implementing
+priority queues. We can use an array or a linked list, kept in order or unordered. These implementations are useful for
+small priority queues, situations where one of the two operations are predominant, or situations where some assumptions
+can be made about the order of the keys involved in the operations
+
+Using unordered sequences is the prototypical lazy approach to this problem, where we defer doing work until necessary (
+to find the maximum); using ordered sequences is the prototypical eager approach to the problem, where we do as much
+work as we can up front (keep the list sorted on insertion) to make later operations efficient.
+
+### Heaps
+
+The binary heap is a data structure that can efficiently support the basic priority-queue operations. This ordering is
+easy to see if we view the keys as being in a binary tree structure with edges from each key to the two keys known to be
+smaller.
+
+> **Definition.** A binary tree is **heap-ordered** if the key in each node is larger than or equal to the keys in that node’s
+> two children (if any).
+
+Equivalently, the key in each node of a heap-ordered binary tree is smaller than or equal to the key in that node’s
+parent (if any). Moving up from any node, we get a nondecreasing sequence of keys; moving down from any node, we get a
+nonincreasing sequence of keys. In particular:
+
+> **Proposition O.** The largest key in a heap-ordered binary tree is found at the root.
+
+**Binary heap representation.** It is particularly convenient to use a *complete binary tree*. We draw such a structure
+by placing the root node and then proceeding down the page and from left to right, drawing and connecting two nodes
+beneath each node on the previous level until we have drawn N nodes. Complete trees provide the opportunity to use a
+compact array representation that does not involve explicit links. Specifically, we represent complete binary trees
+sequentially within an array by putting the nodes in *level order*.
+
+> **Definition.** A binary heap is a collection of keys arranged in a complete heap-ordered binary tree, represented in
+> level order in an array (not using the first entry).
+
+In a heap, the parent of the node in position k is in position ⎣k /2⎦ and, conversely, the two children of the node in
+position k are in positions 2k and 2k + 1. Instead of using explicit links we can travel up and down by doing simple
+arithmetic on array indices: to move up the tree from a[k] we set k to k/2; to move down the tree we set k to 2*k or 2*
+k+1.
+
+Complete binary trees represented as arrays (heaps) are rigid structures, but they have just enough flexibility to allow
+us to implement efficient priority-queue operations. Specifically, we will use them to develop logarithmic-time insert
+and remove the maximum implementations. These algorithms take advantage of the capability to move up and down paths in
+the tree without pointers and have guaranteed logarithmic performance because of the following property of complete
+binary trees:
+
+> **Proposition P.** The height of a complete binary tree of size N is ⎣ lg N ⎦ .
+
+#### Heap algorithms
+
+The heap operations that we consider work by first making a simple modification that could violate the heap condition,
+then traveling through the heap, modifying the heap as required to ensure that the heap condition is satisfied
+everywhere. We refer to this process as *reheapifying*, or *restoring heap order*.
+
+There are two cases. When the priority of some node is increased (or a new node is added at the bottom of a heap), we
+have to travel up the heap to restore the heap order. When the priority of some node is decreased (for example, if we
+replace the node at the root with a new node that has a smaller key), we have to travel down the heap to restore the
+heap order.
+
+**Bottom-up reheapify (swim).** If the heap order is violated because a node’s key becomes larger than that node’s
+parent’s key, then we can make progress toward fixing the violation by exchanging the node with its parent. After the
+exchange, the node is larger than both its children (one is the old parent, and the other is smaller than the old parent
+because it was a child of that node) but the node may still be larger than its parent. We can fix that violation in the
+same way, and so forth, moving up the heap until we reach a node with a larger key, or the root.
+
+The loop in swim() preserves the invariant that the only place the heap order could be violated is when the node at
+position k might be larger than its parent. Therefore, when we get to a place where that node is not larger than its
+parent, we know that the heap order is satisfied throughout the heap.
+
+**Top-down reheapify (sink).** If the heap order is violated because a node’s key becomes smaller than one or both of
+that node’s children’s keys, then we can make progress toward fixing the violation by exchanging the node with the
+larger of its two children. This switch may cause a violation at the child; we fix that violation in the same way, and
+so forth, moving down the heap until we reach a node with both children smaller (or equal), or the bottom.
+
+These sink() and swim() operations provide the basis for efficient implementation of the priority-queue API.
+
+* **Insert.** We add the new key at the end of the array, increment the size of the heap, and then swim up through the
+  heap with that key to restore the heap condition.
+* **Remove the maximum.** We take the largest key off the top, put the item from the end of the heap at the top,
+  decrement the size of the heap, and then sink down through the heap with that key to restore the heap condition.
+
+> **Proposition Q.** In an N-key priority queue, the heap algorithms require no more than 1 + lg N compares for insert
+> and no more than 2 lg N compares for remove the maximum.
+
+**Proof:** By Proposition P, both operations involve moving along a path between the root and the bottom of the heap
+whose number of links is no more than lg N. The remove the maximum operation requires two compares for each node on the
+path (except at the bottom): one to find the child with the larger key, the other to decide whether that child needs to
+be promoted.
+
+a heap-based implementation provides a guarantee that both operations complete in logarithmic time. This improvement can
+make the difference between solving a problem and not being able to address it at all.
+
+**Immutability of keys.** The priority queue contains objects that are created by clients but assumes that client code
+does not change the keys (which might invalidate the heap-order invariant). It is possible to develop mechanisms to
+enforce this assumption, but programmers typically do not do so because they complicate the code and are likely to
+degrade performance.
+
+#### Multiway heaps.
+
+It is not difficult to modify our code to build heaps based on an array representation of complete heap-ordered ternary
+trees, with an entry at position k larger than or equal to entries at positions 3k-1, 3k, and 3k+1 and smaller than or
+equal to entries at position ⎣(k+1)  3⎦, for all indices between 1 and N in an array of N items, and not much more
+difficult to use d-ary heaps for any given d. There is a tradeoff between the lower cost from the reduced tree height (
+log d N) and the higher cost of finding the largest of the d children at each node. This tradeoff is dependent on
+details of the implementation and the expected relative frequency of operations.
+
+#### Index priority queue.
+
+In many applications, it makes sense to allow clients to refer to items that are already on the priority queue. One easy
+way to do so is to associate a unique integer index with each item. Moreover, it is often the case that clients have a
+universe of items of a known size N and perhaps are using (parallel) arrays to store information about the items, so
+other unrelated client code might already be using an integer index to refer to items. These considerations lead us to
+the following API:
+
+> **Proposition Q (continued).** In an index priority queue of size N, the number of compares required is proportional to at
+> most log N for insert, change priority, delete, and remove the minimum.
+
+**Index priority-queue client.** multiway merge problem: it merges together several sorted input streams into one sorted
+output stream. If you have the space, you might just read them all into an array and sort them, but with a priority
+queue, you can read input streams and put them in sorted order on the output no matter how long they are.
+
+#### Heapsort
+
+We can use any priority queue to develop a sorting method. We insert all the items to be sorted into a minimum-oriented
+priority queue, then repeatedly use remove the minimum to remove them all in order. Using a priority queue represented
+as an unordered array in this way corresponds to doing a selection sort; using an ordered array corresponds to doing an
+insertion sort.
+
+we use the heap to develop a classic elegant sorting algorithm known as heapsort. Heapsort breaks into two phases: **
+heap construction**, where we reorganize the original array into a heap, and the **sortdown**, where we pull the items
+out of the heap in decreasing order to build the sorted result. For consistency with the code we have studied, we use a
+maximum-oriented priority queue and repeatedly remove the maximum. Focusing on the task of sorting, we abandon the
+notion of hiding the representation of the priority queue and use swim() and sink() directly. Doing so allows us to sort
+an array without needing any extra space, by maintaining the heap within the array to be sorted.
+
+##### Heap construction.
+
+we can accomplish this task in time proportional to N log N, by proceeding from left to right through the array, using
+swim() to ensure that the items to the left of the scanning pointer make up a heap-ordered complete tree, like
+successive priority-queue insertions.
+
+A clever method that is much more efficient is to proceed from right to left, using sink() to make subheaps as we go.
+Every position in the array is the root of a small subheap; sink() works for such subheaps, as well. If the two children
+of a node are heaps, then calling sink() on that node makes the subtree rooted at the parent a heap. This process
+establishes the heap order inductively.
+
+> **Proposition R.** Sink-based heap construction uses fewer than 2N compares and fewer than N exchanges to construct a
+> heap from N items.
+
+**Proof:** This fact follows from the observation that most of the heaps processed are small. For example, to build a
+heap of 127 elements, we process 32 heaps of size 3, 16 heaps of size 7, 8 heaps of size 15, 4 heaps of size 31, 2 heaps
+of size 63, and 1 heap of size 127, so 32·1 + 16·2 + 8·3 + 4·4 + 2·5 + 1·6 = 120 exchanges (twice as many compares) are
+required (at worst).
+
+As the first phase of a sort, heap construction is a bit counterintuitive, because its goal is to produce a heap-ordered
+result, which has the largest item first in the array (and other larger items near the beginning), not at the end, where
+it is destined to finish.
+
+##### Sortdown.
+
+we remove the largest remaining item from the heap and put it into the array position vacated as the heap shrinks. This
+process is a bit like selection sort (taking the items in decreasing order instead of in increasing order), but it uses
+many fewer compares because the heap provides a much more efficient way to find the largest item in the unsorted part of
+the array.
+
+> **Proposition S.** Heapsort uses fewer than 2N lg N + 2N compares (and half that many exchanges) to sort N items.
+
+**Proof:** The 2 N term covers the cost of heap construction (see Proposition R). The 2 N lg N term follows from
+bounding the cost of each sink operation during the sortdown by 2lg N
+
+> the classical heapsort algorithm was invented by J. W. J. Williams and refined by R. W. Floyd in 1964.
+
+**Sink to the bottom, then swim.** Most items reinserted into the heap during sortdown go all the way to the bottom.
+Floyd observed in 1964 that we can thus save time by avoiding the check for whether the item has reached its position,
+simply promoting the larger of the two children until the bottom is reached, then moving back up the heap to the proper
+position. This idea cuts the number of compares by a factor of 2 asymptotically—close to the number used by mergesort (
+for a randomly-ordered array). The method requires extra bookkeeping, and it is useful in practice only when the cost of
+compares is relatively high
+
+because it is the only method that we have seen that is optimal (within a constant factor) in its use of both time and
+space—it is guaranteed to use ~2N lg N compares and constant extra space in the worst case. When space is very tight (
+for example, in an embedded system or on a low-cost mobile device) it is popular because it can be implemented with just
+a few dozen lines (even in machine code) while still providing optimal performance. However, it is rarely used in
+typical applications on modern systems because it has poor cache performance: array entries are rarely compared with
+nearby array entries, so the number of cache misses is far higher than for quicksort, mergesort, and even shellsort,
+where most compares are with nearby entries.
