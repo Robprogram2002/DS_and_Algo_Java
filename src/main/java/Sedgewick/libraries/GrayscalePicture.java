@@ -1,4 +1,4 @@
-/******************************************************************************
+package Sedgewick.libraries; /******************************************************************************
  *  Compilation:  javac GrayscalePicture.java
  *  Execution:    java GrayscalePicture imagename
  *  Dependencies: none
@@ -68,7 +68,7 @@ import javax.swing.KeyStroke;
  *  <a href="https://introcs.cs.princeton.edu/31datatype">Section 3.1</a> of
  *  <i>Computer Science: An Interdisciplinary Approach</i>
  *  by Robert Sedgewick and Kevin Wayne.
- *  See {@link Picture} for a version that supports 32-bit RGB color images.
+ *  See for a version that supports 32-bit RGB color images.
  *
  *  @author Robert Sedgewick
  *  @author Kevin Wayne

@@ -1,4 +1,4 @@
-/**
+package Sedgewick.libraries; /**
  * Test client for StdIn and In. 
  **/
 

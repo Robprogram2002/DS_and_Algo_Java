@@ -1,3 +1,5 @@
+package Sedgewick.libraries;
+
 /******************************************************************************
  *  Compilation:  javac-introcs  UnicodeTest.java
  *  Execution:    java-introcs  UnicodeTest

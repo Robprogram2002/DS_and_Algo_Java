@@ -1,3 +1,5 @@
+package Sedgewick.libraries;
+
 /******************************************************************************
  *  Compilation:  javac-introcs TestIntroCS.java
  *  Execution:    java-introcs TestIntroCS n

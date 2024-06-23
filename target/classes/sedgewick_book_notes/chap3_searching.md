@@ -259,3 +259,421 @@ each to one plus the sum of the counts in its subtrees. Later in this section an
 more advanced algorithms that are naturally expressed with this same recursive scheme but that can change more links on
 the search paths and need the more general node-count-update code.
 
+### Analysis
+
+The running times of algorithms on binary search trees depend on the shapes of the trees, which, in turn, depend on the
+order in which keys are inserted. In the best case, a tree with N nodes could be perfectly balanced, with ~ lg N nodes
+between the root and each null link. In the worst case there could be N nodes on the search path. The balance in typical
+trees turns out to be much closer to the best case than the worst case
+
+For many applications, the following simple model is reasonable: We assume that the keys are (uniformly) random, or,
+equivalently, that they are inserted in random order. Analysis of this model stems from the observation that BSTs are
+dual to quicksort. The node at the root of the tree corresponds to the first partitioning item in quicksort (no keys to
+the left are larger, and no keys to the right are smaller) and the subtrees are built recursively, corresponding to
+quicksort’s recursive subarray sorts. This observation leads us to the analysis of properties of the trees.
+
+> **Proposition C.** Search hits in a BST built from N random keys require ~ 2 ln N (about 1.39 lg N) compares, on the
+> average.
+
+> **Proposition D.** Insertions and search misses in a BST built from N random keys require ~ 2 ln N (about 1.39 lg N)
+> compares, on the average.
+
+**Proof:** Insertions and search misses take one more compare, on the average, than search hits
+
+Proposition C says that we should expect the BST search cost for random keys to be about 39 percent higher than that for
+binary search. Proposition D says that the extra cost is well worthwhile, because the cost of inserting a new key is
+also expected to be logarithmic—flexibility not available with binary search in an ordered array, where the number of
+array accesses required for an insertion is typically linear. As with quicksort, the standard deviation of the number of
+compares is known to be low, so that these formulas become increasingly accurate as N increases.
+
+#### Order-based methods and deletion
+
+**Minimum and maximum.** If the left link of the root is null, the smallest key in a BST is the key at the root; if the
+left link is not null, the smallest key in the BST is the smallest key in the subtree rooted at the node referenced by
+the left link. This statement is both a description of the recursive min() method and an inductive proof that it finds
+the smallest key in the BST.
+
+The computation is equivalent to a simple iteration (move left until finding a null link), but we use recursion for
+consistency. We might have the recursive method return a Key instead of a Node, but we will later have a need to use
+this method to access the Node containing the minimum key. Finding the maximum key is similar, moving to the right
+instead of to the left
+
+**Floor and ceiling.** If a given key key is less than the key at the root of a BST, then the floor of key (the largest
+key in the BST less than or equal to key) must be in the left subtree. If key is greater than the key at the root, then
+the floor of key could be in the right subtree, but only if there is a key smaller than or equal to key in the right
+subtree; if not (or if key is equal to the key at the root), then the key at the root is the floor of key. Again, this
+description serves both as the basis for the recursive floor() method and for an inductive proof that it computes the
+desired result. Interchanging right and left (and less and greater) gives ceiling().
+
+**Selection.** Suppose that we seek the key of rank k. If the number of keys t in the left subtree is larger than k, we
+look (recursively) for the key of rank k in the left subtree; if t is equal to k, we return the key at the root; and if
+t is smaller than k, we look (recursively) for the key of rank k - t - 1 in the right subtree.
+
+**Rank.** if the given key is equal to the key at the root, we return the number of keys t in the left subtree; if the
+given key is less than the key at the root, we return the rank of the key in the left subtree (recursively computed);
+and if the given key is larger than the key at the root, we return t plus one (to count the key at the root) plus the
+rank of the key in the right subtree .
+
+**Delete the minimum/maximum.** we write a recursive method that takes a link to a Node as argument and returns a link
+to a Node, so that we can reflect changes to the tree by assigning the result to the link used as argument. For
+deleteMin() we go left until finding a Node that has a null left link and then replace the link to that node by its
+right link (simply by returning the right link in the recursive method). The deleted node, with no link now pointing to
+it, is available for garbage collection. Our standard recursive setup accomplishes, after the deletion, the task of
+setting the appropriate link in the parent and updating the counts in all nodes in the path to the root. The symmetric
+method works for deleteMax().
+
+**Delete.**  We can proceed in a similar manner to delete any node that has one child (or no children), but what can we
+do to delete a node that has two children? The answer is to delete a node x by replacing it with its successor. Because
+x has a right child, its successor is the node with the smallest key in its right subtree. The replacement preserves
+order in the tree because there are no keys between x.key and the successor’s key. We can accomplish the task of
+replacing x by its successor in four (!) easy steps:
+
+* Save a link to the node to be deleted in t.
+* Set x to point to its successor min(t.right).
+* Set the right link of x (which is supposed to point to the BST containing all the keys larger than x.key) to
+  deleteMin(t.right), the link to the BST containing all the keys that are larger than x.key after the deletion.
+* Set the left link of x (which was null) to t.left (all the keys that are less than both the deleted key and its
+  successor).
+
+Our standard recursive setup accomplishes, after the recursive calls, the task of setting the appropriate link in the
+parent and decrementing the node counts in the nodes on the path to the root.
+
+While this method does the job, it has a flaw that might cause performance problems in some practical situations. The
+problem is that the choice of using the successor is arbitrary and not symmetric. Why not use the predecessor? In
+practice, it is worthwhile to choose at random between the predecessor and the successor.
+
+**Range queries.** To implement the keys() method that returns the keys in a given range, we begin with a basic
+recursive BST traversal method, known as *inorder traversal*. To implement the two-argument keys() method that returns
+to a client all the keys in a specified range, we modify this code to add each key that is in the range to a Queue, and
+to skip the recursive calls for subtrees that cannot contain keys in the range
+
+#### Analysis.
+
+How efficient are the order-based operations in BSTs? To study this question, we consider the *tree height* (the maximum
+depth of any node in the tree). Given a tree, its height determines the worst-case cost of all BST operations (except
+for range search).
+
+> **Proposition E.** In a BST, all operations take time proportional to the height of the tree, in the worst case.
+
+The average height of a BST built from random keys was shown to be logarithmic by J. Robson in 1979, and L. Devroye
+later showed that the value approaches 2.99 lg N for large N.
+
+## 3.3 BALANCED SEARCH TREES
+
+We introduce in this section a type of binary search tree where costs are guaranteed to be logarithmic, no matter what
+sequence of keys is used to construct them. Ideally, we would like to keep our binary search trees perfectly balanced.
+In an N-node tree, we would like the height to be ~lg N so that we can guarantee that all searches can be completed in ~
+lg N compares, just as for binary search.
+
+Unfortunately, maintaining perfect balance for dynamic insertions is too expensive. we consider a data structure that
+slightly relaxes the perfect balance requirement to provide guaranteed logarithmic performance for all the ordered
+symbol table API operations (except range search).
+
+### 2-3 search trees
+
+Specifically, referring to the nodes in a standard BST as 2-nodes (they hold two links and one key), we now also allow
+3-nodes, which hold three links and two keys. Both 2-nodes and 3-nodes have one link for each of the intervals subtended
+by its keys.
+
+**Definition.** A 2-3 search tree is a tree that is either empty or
+
+* A 2-node, with one key (and associated value) and two links, a left link to a 2-3 search tree with smaller keys, and a
+  right link to a 2-3 search tree with larger keys
+* A 3-node, with two keys (and associated values) and three links, a left link to a 2-3 search tree with smaller keys, a
+  middle link to a 2-3 search tree with keys between the node’s keys, and a right link to a 2-3 search tree with larger
+  keys
+
+As usual, we refer to a link to an empty tree as a null link.
+
+A **perfectly balanced 2-3 search tree** is one whose null links are all the same distance from the root. To be concise,
+we use the term 2-3 tree to refer to a perfectly balanced 2-3 search tree.
+
+> **Proposition F.** Search and insert operations in a 2-3 tree with N keys are guaranteed to visit at most lg N nodes.
+
+Thus, we can guarantee good worst-case performance with 2-3 trees. The amount of time required at each node by each of
+the operations is bounded by a constant, and both operations examine nodes on just one path, so the total cost of any
+search or insert is guaranteed to be logarithmic.
+
+Although it is possible to write code that performs transformations on distinct data types representing 2- and 3-nodes,
+most of the tasks that we have described are inconvenient to implement in this direct representation because there are
+numerous cases to be handled. We would need to maintain two different types of nodes, compare search keys against each
+of the keys in the nodes, copy links and other information from one type of node to another, convert nodes from one type
+to another, and so forth. Not only is there a substantial amount of code involved, but the overhead incurred could make
+the algorithms slower than standard BST search and insert. The primary purpose of balancing is to provide insurance
+against a bad worst case, but we would prefer the overhead cost for that insurance to be low
+
+Fortunately, we can do the transformations in a uniform way using little overhead.
+
+## Red-black BSTs
+
+The insertion algorithm for 2-3 trees just described is not difficult to understand; now, we will see that it is also
+not difficult to implement. We will consider a simple representation known as a red-black BST that leads to a natural
+implementation. In the end, not much code is required, but understanding how and why the code gets the job done requires
+a careful look.
+
+The basic idea behind red-black BSTs is to encode 2-3 trees by starting with standard BSTs (which are made up of
+2-nodes) and adding extra information to encode 3-nodes. We think of the links as being of two different types: **red
+links**, which bind together two 2-nodes to represent 3-nodes, and **black links**, which bind together the 2-3 tree.
+Specifically, we represent 3-nodes as two 2-nodes connected by a single red link that leans left (one of the 2-nodes is
+the left child of the other).
+
+One advantage of using such a representation is that it allows us to use our get() code for standard BST search without
+modification. Given any 2-3 tree, we can immediately derive a corresponding BST, just by converting each node as
+specified. We refer to BSTs that represent 2-3 trees in this way as red-black BSTs.
+
+**An equivalent definition**. Another way to proceed is to define red-black BSTs as BSTs having red and black links and
+satisfying the following three restrictions:
+
+* Red links lean left.
+* No node has two red links connected to it.
+* The tree has perfect black balance : every path from the root to a null link has the same number of black links.
+
+There is a 1-1 correspondence between red-black BSTs defined in this way and 2-3 trees. If we draw the red links
+horizontally in a red-black BST, all of the null links are the same distance from the root, and if we then collapse
+together the nodes connected by red links, the result is a 2-3 tree.
+
+Conversely, if we draw 3-nodes in a 2-3 tree as two 2-nodes connected by a red link that leans left, then no node has
+two red links connected to it, and the tree has perfect black balance, since the black links correspond to the 2-3 tree
+links, which are perfectly balanced by definition.
+
+> Whichever way we choose to define them, red-black BSTs are both BSTs and 2-3 trees.
+
+Thus, if we can implement the 2-3 tree insertion algorithm by maintaining the 1-1 correspondence, then we get the best
+of both worlds: the simple and efficient search method from standard BSTs and the efficient insertion-balancing method
+from 2-3 trees.
+
+**Color representation.** For convenience, since each node is pointed to by precisely one link (from its parent), we
+encode the color of links in nodes, by adding a boolean instance variable color to our Node data type, which is true if
+the link from the parent is red and false if tit is black. By convention, null links are black. For clarity in our code,
+we define constants RED and BLACK for use in setting and testing this variable. We use a private method isRed() to test
+the color of a node’s link to its parent. When we refer to the color of a node, we are referring to the color of the
+link pointing to it, and vice versa.
+
+### Rotations.
+
+The implementation that we will consider might allow right-leaning red links or two red links in a row during an
+operation, but it always corrects these conditions before completion, through judicious use of an operation called
+rotation that switches the orientation of red links.
+
+Whether left or right, every rotation leaves us with a link. We always use the link returned by rotateRight() or
+rotateLeft() to reset the appropriate link in the parent (or the root of the tree). This link may be red or black. This
+might allow two red links in a row to occur within the tree, but our algorithms will also use rotations to correct this
+condition when it arises.
+
+We can use rotations to help maintain the 1-1 correspondence between 2-3 trees and red-black BSTs as new keys are
+inserted because they preserve the two defining properties of red-black BSTs: order and perfect black balance. That is,
+we can use rotations on a red-black BST without having to worry about losing its order or its perfect black balance.
+Next, we see how to use rotations to preserve the other two defining properties of redblack BSTs (no consecutive red
+links on any path and no right-leaning red links).
+
+In summary, we achieve the desired result by doing zero, one, or two rotations followed by flipping the colors of the
+two children of the root.
+
+**Flipping colors.** In addition to flipping the colors of the children from red to black, we also flip the color of the
+parent from black to red. A critically important characteristic of this operation is that, like rotations, it is a local
+transformation that preserves perfect black balance in the tree.
+
+Flipping the colors makes the link to the middle node red, which amounts to passing it up to its parent, putting us back
+in the same situation with respect to the parent, which we can fix by moving up the tree.
+
+**Passing a red link up the tree.** The 2-3 tree insertion algorithm calls for us to split the 3-node, passing the
+middle key up to be inserted into its parent, continuing until encountering a 2-node or the root. In every case we have
+considered, we precisely accomplish this objective: after doing any necessary rotations, we flip colors, which turns the
+middle node to red. From the point of view of the parent of that node, that link becoming red can be handled in
+precisely the same manner as if the red link came from attaching a new node: we pass up a red link to the middle node
+
+> to insert into a 3-node, create a temporary 4-node, split it, and pass a red link to the middle key up to its parent.
+> Continuing the same process, we pass a red link up the tree until reaching a 2-node or the root.
+
+In summary, we can maintain our 1-1 correspondence between 2-3 trees and red-black BSTs during insertion by judicious
+use of three simple operations: left rotate, right rotate, and color flip. We can accomplish the insertion by performing
+the following operations, one after the other, on each node as we pass up the tree from the point of insertion:
+
+* If the right child is red and the left child is black, rotate left.
+* If both the left child and its left child are red, rotate right.
+* If both children are red, flip colors.
+
+Note that the first operation handles both the rotation necessary to lean the 3-node to the left when the parent is a
+2-node and the rotation necessary to lean the bottom link to the left when the new red link is the middle link in a
+3-node.
+
+### Deletion
+
+As with insertion, we can define a sequence of local transformations that allow us to delete a node while still
+maintaining perfect balance. The process is somewhat more complicated than for insertion, because we do the
+transformations both on the way down the search path, when we introduce temporary 4-nodes (to allow for a node to be
+deleted), and also on the way up the search path, where we split any leftover 4-nodes (in the same manner as for
+insertion).
+
+**Properties of red-black BSTs.** Studying the properties of red-black BSTs is a matter of checking the correspondence
+with 2-3 trees and then applying the analysis of 2-3 trees. The end result is that all symbol-table operations in
+red-black BSTs are guaranteed to be logarithmic in the size of the tree.
+
+> **Proposition G.** The height of a red-black BST with N nodes is no more than 2 lg N.
+
+> **Property H.** The average length of a path from the root to a node in a red-black BST with N nodes is ~1.00 lg N.
+
+The get() method in red-black BSTs does not examine the node color, so the balancing mechanism adds no overhead; search
+is faster than in elementary BSTs because the tree is balanced. Each key is inserted just once, but may be involved in
+many, many search operations, so the end result is that we get search times that are close to optimal (because the trees
+are nearly balanced and no work for balancing is done during the searches) at relatively little cost (unlike binary
+search, insertions are guaranteed to be logarithmic). The inner loop of the search is a compare followed by updating a
+link, which is quite short, like the inner loop of binary search (compare and index arithmetic).
+
+**Ordered symbol-table API.** One of the most appealing features of red-black BSTs is that the complicated code is
+limited to the put() (and deletion) methods. Our code for the minimum/maximum, select, rank, floor, ceiling and range
+queries in standard BSTs can be used without any change, since it operates on BSTs and has no need to refer to the node
+color. Moreover, all the methods benefit from the near-perfect balance in the tree because they all require time
+proportional to the tree height, at most. Thus Proposition G, in combination with Proposition E, suffices to establish a
+logarithmic performance guarantee for all of them.
+
+## 3.4 HASH TABLES
+
+Search algorithms that use hashing consist of two separate parts. The first part is to compute a **hash function** that
+transforms the search key into an array index. Ideally, different keys would map to different indices. This ideal is
+generally beyond our reach, so we have to face the possibility that two or more different keys may hash to the same
+array index. Thus, the second part of a hashing search is a **collision-resolution** process that deals with this
+situation.
+
+Hashing is a classic example of a time-space tradeoff. If there were no memory limitation, then we could do any search
+with only one memory access by simply using the key as an index in a (potentially huge) array.On the other hand, if
+there were no time limitation, then we can get by with only a minimum amount of memory by using sequential search in an
+unordered array. Hashing provides a way to use a reasonable amount of both memory and time to strike a balance between
+these two extremes. Indeed, it turns out that we can trade off time and memory in hashing algorithms by adjusting
+parameters, not by rewriting code. To help choose values of the parameters, we use classical results from probability
+theory.
+
+With hashing, you can implement search and insert for symbol tables that require constant (amortized) time per operation
+in typical applications, making it the method of choice for implementing basic symbol tables in many situations.
+
+### Hash function
+
+If we have an array that can hold M key-value pairs, then we need a hash function that can transform any given key into
+an index into that array: an integer in the range [0, M – 1]. We seek a hash function that both is easy to compute and
+uniformly distributes the keys: for each key, every integer between 0 and M – 1 should be equally likely (independently
+for every key).
+
+> The hash function depends on the key type. Strictly speaking, we need  a different hash function for each key type
+> that we use.
+
+**Positive integers.** The most commonly used method for hashing integers is called **modular hashing** : we choose the
+array size M to be prime and, for any positive integer key k, compute the remainder when dividing k by M. This function
+is very easy to compute (k % M, in Java) and is effective in dispersing the keys evenly between 0 and M – 1. If M is not
+prime, it may be the case that not all of the bits of the key play a role, which amounts to missing an opportunity to
+disperse the values evenly.
+
+**Floating-point numbers.** One way to address this situation is to use modular hashing on the binary representation of
+the key (this is what Java does).
+
+**Strings.** Modular hashing works for long keys such as strings, too: we simply treat them as huge integers. For
+example,
+
+    int hash = 0;
+    for (int i = 0; i < s.length(); i++) 
+      hash = (R * hash + s.charAt(i)) % M;
+
+recall that charAt() returns a char value in Java, which is a 16-bit nonnegative integer. If R is greater than any
+character value, this computation would be equivalent to treating the String as an N-digit base-R integer, computing the
+remainder that results when dividing that number by M. A classic algorithm known as **Horner’s method** gets the job
+done with N multiplications, additions, and modulus operations. If the value of R is sufficiently small that no overflow
+occurs, the result is an integer between 0 and M – 1, as desired. The use of a small prime integer such as 31 ensures
+that the bits of all the characters play a role. Java’s default implementation for String uses a method like this.
+
+**Compound keys.** If the key type has multiple integer fields, we can typically mix them together in the way just
+described for String values. For example, for our Date ADT
+
+    public int hashCode() { 
+      int hash = 17; 
+      hash = 31 * hash + who.hashCode(); 
+      hash = 31 * hash + when.hashCode(); 
+      hash = 31 * hash + ((Double) amount).hashCode();
+      return hash; 
+    }
+
+**Java conventions.** Java helps us address the basic problem that every type of data needs a hash function by ensuring
+that every data type inherits a method called hashCode() that returns a 32-bit integer. The implementation of hashCode()
+for a data type must be consistent with equals. That is, if a.equals(b) is true, then a.hashCode() must have the same
+numerical value as b.hashCode(). Conversely, if the hashCode() values are different, then we know that the objects are
+not equal. If the hashCode() values are the same, the objects may or may not be equal, and we must use equals() to
+decide which condition holds. This convention is a basic requirement for clients to be able to use hashCode() for symbol
+tables. Note that it implies that you must override both hashCode() and equals() if you need to hash with a user-defined
+type.
+
+**Converting a hashCode() to an array index.** Since our goal is an array index, not a 32-bit integer, we combine
+hashCode() with modular hashing in our implementations to produce integers between 0 and M – 1, as follows:
+
+    private int hash(Key x) { 
+      return (x.hashCode() & 0x7fffffff) % M; 
+    }
+
+This code masks off the sign bit (to turn the 32-bit number into a 31-bit nonnegative integer) and then computes the
+remainder when dividing by M, as in modular hashing. Programmers commonly use a prime number for the hash table size M
+when using code like this, to attempt to make use of all the bits of the hash code.
+
+**Software caching.** If computing the hash code is expensive, it may be worthwhile to cache the hash for each key. That
+is, we maintain an instance variable hash in the key type that contains the value of hashCode() for each key object. On
+the first call to hashCode(), we have to compute the full hash code (and set the value of hash), but subsequent calls on
+hashCode() simply return the value of hash. Java uses this technique to reduce the cost of computing hashCode() for
+String objects.
+
+> **Assumption J ( uniform hashing assumption)**. The hash functions that we use uniformly and independently distribute
+> keys among the integer values between 0 and M – 1.
+
+A fundamental assumption that we make when using hashing, an idealized model that we do not actually expect to achieve,
+but that guides our thinking when implementing hashing algorithms
+
+### Hashing with separate chaining
+
+The second component of a hashing algorithm is collision resolution: a strategy for handling the case when two or more
+keys to be inserted hash to the same index. A straightforward and general approach to collision resolution is to build,
+for each of the M array indices, a linked list of the key-value pairs whose keys hash to that index. This method is
+known as separate chaining because items that collide are chained together in separate linked lists.
+
+The basic idea is to choose M to be sufficiently large that the lists are sufficiently short to enable efficient search
+through a two-step process: hash to find the list that could contain the key, then sequentially search through that list
+for the key.
+
+One way to proceed is to expand SequentialSearchST to implement separate chaining using linked-list primitives.
+
+A simpler (though slightly less efficient) way to proceed is to adopt a more general approach: we build, for each of the
+M array indices, a symbol table of the keys that hash to that index, thus reusing code that we have already developed.
+The implementation `SeparateChainingHashST`  maintains an array of SequentialSearchST objects and implements get() and
+put() by computing a hash function to choose which SequentialSearchST object can contain the key and then using get()
+and put() (respectively) from SequentialSearchST to complete the job.
+
+> Since we have M lists and N keys, the average length of the lists is always N  M, no matter how the keys are
+> distributed among the lists Separate chaining is useful in practice because each list is extremely likely to have
+> about N/M key-value pairs
+
+> **Proposition K.** In a separate-chaining hash table with M lists and N keys, the probability (under Assumption J) that the
+> number of keys in a list is within a small constant factor of N/M is extremely close to 1.
+
+> **Property L.** In a separate-chaining hash table with M lists and N keys, the number of compares (equality tests) for
+> search miss and insert is ~N/M.
+
+**Table size.** In a separate-chaining implementation, our goal is to choose the table size M to be sufficiently small
+that we do not waste a huge area of contiguous memory with empty chains but sufficiently large that we do not waste time
+searching through long chains. One of the virtues of separate chaining is that this decision is not critical: if more
+keys arrive than expected, then searches will take a little longer than if we had chosen a bigger table size ahead of
+time; if fewer keys are in the table, then we have extra-fast search with some wasted space.
+
+When space is not a critical resource, M can be chosen sufficiently large that search time is constant; when space is a
+critical resource, we still can get a factor of M improvement in performance by choosing M to be as large as we can
+afford.
+
+**Deletion.** To delete a key-value pair, simply hash to find the SequentialSearchST containing the key, then invoke the
+delete() method for that table. Reusing code in this way is preferable to reimplementing this basic operation on linked
+lists.
+
+**Ordered operations.** The whole point of hashing is to uniformly disperse the keys, so any order in the keys is lost
+when hashing. If you need to quickly find the maximum or minimum key, find keys in a given range, or implement any of
+the other operations in the ordered symbol-table API , then hashing is not appropriate, since these operations will all
+take linear time.
+
+Hashing with separate chaining is easy to implement and probably the fastest (and most widely used) symbol-table
+implementation for applications where key order is not important. When your keys are built-in Java types or your own
+type with well-tested implementations of hashCode(), this implementation provides a quick and easy path to fast search
+and insert
+
+### Hashing with linear probing
+

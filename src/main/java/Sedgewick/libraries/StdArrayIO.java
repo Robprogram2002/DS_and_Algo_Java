@@ -1,3 +1,5 @@
+package Sedgewick.libraries;
+
 /******************************************************************************
  *  Compilation:  javac StdArrayIO.java
  *  Execution:    java StdArrayIO < input.txt
@@ -46,6 +48,8 @@
  *
  ******************************************************************************/
 
+
+import Sedgewick.libraries.StdIn;
 
 /**
  *  <i>Standard array IO</i>. This class provides methods for reading
