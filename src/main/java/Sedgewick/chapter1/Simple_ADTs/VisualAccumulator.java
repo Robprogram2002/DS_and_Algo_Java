@@ -1,16 +1,22 @@
 package Sedgewick.chapter1.Simple_ADTs;
 
+import Sedgewick.chapter1.Simple_ADTs.Interfaces.Accumulatable;
 import Sedgewick.libraries.StdDraw;
 import Sedgewick.libraries.StdOut;
 import Sedgewick.libraries.StdRandom;
 
 /**
- * An abstract data type for accumulating data values (visual version)
+ * Visual implementation of the abstract data type for accumulating data values
  */
-public class VisualAccumulator {
+public class VisualAccumulator implements Accumulatable {
     private double total;
     private int N;
 
+    /**
+     * Create an object with default initial values and set the parameters for the axis scales
+     * @param trials Maximum number of values that will be sum
+     * @param max Maximum value of the y-axis scale
+     */
     public VisualAccumulator(int trials, double max) {
         StdDraw.setXscale(0, trials);
         StdDraw.setYscale(0, max);

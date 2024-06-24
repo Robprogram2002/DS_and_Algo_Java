@@ -1,29 +1,28 @@
 package Sedgewick.chapter1.Simple_ADTs;
 
+import Sedgewick.chapter1.Simple_ADTs.Interfaces.ICounter;
 import Sedgewick.libraries.StdOut;
 import Sedgewick.libraries.StdRandom;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class Counter implements Comparable<Counter> {
-    // To define data-type values (the state of each object), we declare instance variables
+/**
+ * Simple implementation of the ICounter ADT
+ */
+public class Counter implements ICounter {
 
-    // In ADT implementations, we use private, using a Java language mechansim to enforce the idea that the
-    // representation of an ADT is to be hidden from the client, and also final, if the value is not to be changed once it is initialized
-
+    // Instance Variables
+    /**
+     * String that stored the public name of the counter
+     */
     private final String name;
+    /**
+     * Integer storing the count value
+     */
     private int count;
 
-    // Every Java class has at least one constructor that establishes an object’s identity.
-    // Every constructor creates an object and provides to the client a reference to that object.
-    // We can overload the name and have multiple constructors with different signatures, just as with methods.
-
-
-    // The default values of instance variables are 0 for primitive numeric types, false for boolean, and null for
-    // reference types. These defaults may be changed by using initializing declarations for instance variables.
-    // Java automatically invokes a constructor when a client program uses the keyword new. Overloaded constructors
-    // are typically used to initialize instance variables to client-supplied values other than the defaults.
-
+    // Constructor methods
     /**
      * Create a counter with initial count to 0
      *
@@ -47,8 +46,7 @@ public class Counter implements Comparable<Counter> {
         this.count = count;
     }
 
-    // implement data-type instance methods (the behavior of each object)
-
+    // Instance Methods
     public void increment() {
         this.count += 1;
     }
@@ -57,10 +55,11 @@ public class Counter implements Comparable<Counter> {
         return this.count;
     }
 
-    public String get_name() {
+    public String getName() {
         return this.name;
     }
 
+    // Override Methods
     @Override
     public String toString() {
         return "Counter{" +
@@ -70,14 +69,8 @@ public class Counter implements Comparable<Counter> {
     }
 
     @Override
-    public int compareTo(Counter that) {
-        // long form
-        //  if (this.count < that.count) return -1;
-        //  else if (this.count > that.count) return +1;
-        //  else return 0;
-
-        // Short form
-        return Integer.compare(this.count, that.count);
+    public int compareTo(@NotNull ICounter o) {
+        return Integer.compare(this.count, o.tally());
     }
 
     @Override
@@ -93,6 +86,7 @@ public class Counter implements Comparable<Counter> {
         return Objects.hash(count);
     }
 
+    // Unit test
     /**
      * Reads two command-line integers n and trials; creates n counters;
      * increments trials counters at random; and prints results.
@@ -131,4 +125,20 @@ public class Counter implements Comparable<Counter> {
         }
 
     }
+
 }
+
+// To define data-type values (the state of each object), we declare instance variables
+
+// In ADT implementations, we use private, using a Java language mechanism to enforce the idea that the
+// representation of an ADT is to be hidden from the client, and also final, if the value is not to be changed
+// once it is initialized
+
+// Every Java class has at least one constructor that establishes an object’s identity.
+// Every constructor creates an object and provides to the client a reference to that object.
+// We can overload the name and have multiple constructors with different signatures, just as with methods.
+
+// The default values of instance variables are 0 for primitive numeric types, false for boolean, and null for
+// reference types. These defaults may be changed by using initializing declarations for instance variables.
+// Java automatically invokes a constructor when a client program uses the keyword new. Overloaded constructors
+// are typically used to initialize instance variables to client-supplied values other than the defaults.

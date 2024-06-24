@@ -1,15 +1,18 @@
 package Sedgewick.chapter1.Simple_ADTs.geometrics;
 
 
+import Sedgewick.chapter1.Simple_ADTs.Interfaces.IPoint2D;
 import Sedgewick.libraries.StdDraw;
+import Sedgewick.libraries.StdOut;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
- * Class that represent an abstraction of a point in the 2-dimensional euclidean space
+ * Simple Implementation of a point in the 2-Dimensional Euclidean Space
  */
-public class Point2D {
-    private double x;
-    private double y;
+public class Point2D implements IPoint2D {
+    final private double x;
+    final private double y;
 
     /**
      * Create a Point given its coordinates
@@ -29,47 +32,28 @@ public class Point2D {
         this.y = y;
     }
 
-    /**
-     * @return coordinate on the x-axis
-     */
     public double x() {
         return this.x;
     }
 
-    /**
-     * @return coordinate on the y-axis
-     */
     public double y() {
         return this.y;
     }
 
-    /**
-     * @return radius of the point in polar coordinates
-     */
-    public double radius() {
+    public double r() {
         return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
     }
 
-    /**
-     * @return the angle (in radians) of this point in polar coordinates (between –&pi; and &pi;)
-     */
     public double theta() {
         return Math.atan2(y, x);
     }
 
-    /**
-     * @param that The other point
-     * @return Euclidean distance from this point to that
-     */
-    public double distTo(Point2D that) {
-        double dist_x = x - that.x();
-        double dist_y = y - that.y();
+    public double distanceTo(IPoint2D point) {
+        double dist_x = x - point.x();
+        double dist_y = y - point.y();
         return Math.sqrt(Math.pow(dist_x, 2) + Math.pow(dist_y, 2));
     }
 
-    /**
-     * Draw the point represented by the object in the plane
-     */
     public void draw() {
         StdDraw.setXscale(0, 10);
         StdDraw.setYscale(0, 10);
@@ -77,9 +61,46 @@ public class Point2D {
         StdDraw.circle(x, y, 2);
     }
 
+    /**
+     * Compare the distance from the origin of two points
+     *
+     * @param o the object to be compared.
+     * @return 0 if both have the same distance to the origin, a number greater than 0 if
+     * this object has a greater distance and a number lower than 0 if the other object has
+     * a greater distance
+     */
+    @Override
+    public int compareTo(@NotNull IPoint2D o) {
+        return Double.compare(this.r() - o.r(), 0.0);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Point2D point = (Point2D) o;
+        if (Double.compare(point.x, x) != 0) return false;
+        return Double.compare(point.y, y) == 0;
+    }
+
     public static void main(String[] args) {
         Point2D p1 = new Point2D(2.3, 3.2);
+        Point2D p2 = new Point2D(1.0, 1.0);
+        StdOut.println(p1.r());
+        StdOut.println(p1.theta());
+        StdOut.println(p1.distanceTo(p2));
+        StdOut.println(p1.equals(p2));
+        StdOut.println(p1.compareTo(p2));
+        StdOut.println(p1 + " | " + p2);
+
         p1.draw();
+
     }
+
 
 }

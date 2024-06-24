@@ -1,13 +1,20 @@
 package Sedgewick.chapter1.Simple_ADTs;
 
+import Sedgewick.chapter1.Simple_ADTs.Interfaces.Accumulatable;
 import Sedgewick.libraries.StdOut;
 import Sedgewick.libraries.StdRandom;
 
-public class Acomulator {
+/**
+ * Implementation of the Accumulatable interface
+ */
+public class Accumulator implements Accumulatable {
     private double total;
     private int N;
 
-    public Acomulator() {
+    /**
+     * Creates an accumulator object with default initial values.
+     */
+    public Accumulator() {
     }
 
     public void addDataValue(double val) {
@@ -25,10 +32,9 @@ public class Acomulator {
                 + String.format("%7.5f", this.mean());
     }
 
-    // Test code
     public static void main(String[] args) {
         int T = Integer.parseInt(args[0]);
-        Acomulator a = new Acomulator();
+        Accumulator a = new Accumulator();
         for (int t = 0; t < T; t++)
             a.addDataValue(StdRandom.uniform());
         StdOut.println(a);

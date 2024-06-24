@@ -1,4 +1,4 @@
-package Sedgewick.chapter1.Simple_ADTs;
+package Sedgewick.chapter1.Simple_ADTs.Clients;
 
 import Sedgewick.libraries.StdIn;
 import Sedgewick.libraries.StdOut;
@@ -13,9 +13,7 @@ public class StringExamples {
         return true;
     }
 
-    // check whether an array of strings is in
-    //alphabetical order
-
+    // check whether an array of strings is in alphabetical order
     public boolean isSorted(String[] a) {
         for (int i = 1; i < a.length; i++) {
             if (a[i - 1].compareTo(a[i]) > 0) return false;
@@ -25,12 +23,12 @@ public class StringExamples {
 
 
     public static void main(String[] args) {
-        // extract file name
-        //and extension from a command-line argument
+        // extract file name and extension from a command-line argument
         String s = args[0];
         int dot = s.indexOf(".");
         String base = s.substring(0, dot);
         String extension = s.substring(dot + 1, s.length());
+        StdOut.println("The file extension is:" +  extension);
 
         // print all lines in standard input that contain a string
         // specified on the command line
@@ -44,6 +42,7 @@ public class StringExamples {
         //of the strings on StdIn delimited by whitespace
         String input = StdIn.readAll();
         String[] words = input.split("\\s+");
+        StdOut.println(words);
     }
 
 }

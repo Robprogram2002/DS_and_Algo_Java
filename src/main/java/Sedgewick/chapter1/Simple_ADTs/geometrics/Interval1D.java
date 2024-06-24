@@ -1,13 +1,23 @@
 package Sedgewick.chapter1.Simple_ADTs.geometrics;
 
+import Sedgewick.chapter1.Simple_ADTs.Interfaces.I1DInterval;
 import Sedgewick.libraries.StdDraw;
+import Sedgewick.libraries.StdOut;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Class that represent an abstraction of an interval in real line
+ * Simple implementation of the I1DInterval ADT
  */
-public class Interval1D {
-    private double lo;
-    private double hi;
+public class Interval1D implements I1DInterval {
+    /**
+     * Left end of the interval
+     */
+    final private double low;
+
+    /**
+     * Right end of the interval
+     */
+    final private double high;
 
     /**
      * create an interval given lower and upper limits
@@ -23,63 +33,71 @@ public class Interval1D {
             throw new IllegalArgumentException("Limits cannot be equal");
         }
 
-        this.lo = lo;
-        this.hi = hi;
+        this.low = lo;
+        this.high = hi;
     }
 
-    /**
-     * @return length of the interval
-     */
     public double length() {
-        return Math.abs(hi - lo);
+        return Math.abs(high - low);
     }
 
-    /**
-     * @param x real value
-     * @return boolean representing whether this value is in the interval
-     */
     public boolean contains(double x) {
-        return lo <= x && x <= hi;
+        return low <= x && x <= high;
     }
 
-    /**
-     * @return lower limit
-     */
     public double lower() {
-        return this.lo;
+        return this.low;
     }
 
-    /**
-     * @return upper limit
-     */
     public double upper() {
-        return this.hi;
+        return this.high;
     }
 
-    /**
-     * @param that Interval1D instance to check if there exist an intersection
-     * @return boolean representing whether the two interval intersect
-     */
-    public boolean intersects(Interval1D that) {
-        if (that.contains(lo) || that.contains(hi)) return true;
-        else return this.contains(that.lower()) || this.contains(that.upper());
+    public boolean intersects(I1DInterval that) {
+        double that_high = that.upper();
+        if (this.high > that_high) {
+            return this.low < that_high;
+        }
+        return this.high > that.lower();
+
+        // if (that.contains(low) || that.contains(high)) return true;
+        // else return this.contains(that.lower()) || this.contains(that.upper());
     }
 
     public void draw() {
-        StdDraw.setXscale(lo / 2.0, hi * 2.0);
+        StdDraw.setXscale(low / 2.0, high * 2.0);
         StdDraw.setYscale(0, 10);
-        StdDraw.line(lo, 1, hi, 1);
+        StdDraw.line(low, 1, high, 1);
     }
 
-    /**
-     * @return the middle point of the interval
-     */
     public double middle() {
-        return (this.hi - this.lo) / 2.0;
+        return (this.high - this.low) / 2.0;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + low + "," + high + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Interval1D interval = (Interval1D) o;
+        return (this.high == interval.high) && (this.low == interval.low);
     }
 
     public static void main(String[] args) {
         Interval1D i1 = new Interval1D(1.3, 6.2);
+        Interval1D i2 = new Interval1D(0.2, 1.4);
+        StdOut.println(i1.upper());
+        StdOut.println(i1.lower());
+        StdOut.println(i1.length());
+        StdOut.println(i1.middle());
+        StdOut.println(i1.contains(7.0));
+        StdOut.println(i1.equals(new Interval1D(1.3, 3.2)));
+        StdOut.println(i1.intersects(i2));
+        StdOut.println(i1 + " | " + i2);
+
         i1.draw();
     }
 
